@@ -23,8 +23,11 @@ WebIlluminator is a browser extension that repairs accessibility gaps on the mod
 - Components communicate via Chrome message passing; no backend server.
 
 ### Testing Strategy
-- Manual smoke tests in Chrome using the example "broken" page.
+- Manual smoke tests in Chrome using the example "broken" pages.
 - Verify `aria-label`/`alt` injection, no functional regressions, and correct key storage.
+
+### Documentation
+- For significant feature or code changes, update related docs (README, examples, specs) in the same change.
 
 ### Git Workflow
 - Use short-lived feature branches when working on non-trivial changes.
