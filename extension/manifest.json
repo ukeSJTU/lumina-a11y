@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "WebIlluminator",
+  "version": "0.1.0",
+  "description": "Repairs accessibility gaps by labeling unlabeled UI elements.",
+  "action": {
+    "default_title": "WebIlluminator",
+    "default_popup": "popup/popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["storage", "tabs", "activeTab", "scripting"],
+  "host_permissions": ["https://generativelanguage.googleapis.com/*", "<all_urls>"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

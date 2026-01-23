@@ -1,0 +1,59 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  min-width: 260px;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+.container {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+h1 {
+  font-size: 16px;
+  margin: 0 0 4px 0;
+}
+
+.field {
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+
+input {
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #334155;
+  background: #1e293b;
+  color: #f8fafc;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+button {
+  flex: 1;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: none;
+  background: #38bdf8;
+  color: #0f172a;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button#saveKey {
+  background: #94a3b8;
+}
+
+.status {
+  min-height: 16px;
+  font-size: 12px;
+  margin: 0;
+  color: #cbd5f5;
+}
