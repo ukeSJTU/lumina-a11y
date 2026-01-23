@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Custom Controls Without Semantics</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main class="page">
+      <header class="header">
+        <p class="eyebrow">ARIA anti-pattern demo</p>
+        <h1>Custom Controls Without Semantics</h1>
+        <p class="subtitle">
+          These interactive elements are built from plain <code>&lt;div&gt;</code>
+          blocks without roles, tabindex, or keyboard support.
+        </p>
+      </header>
+
+      <section class="card">
+        <h2>Player settings</h2>
+        <div class="control-row">
+          <div class="toggle" data-state="off">
+            <div class="toggle-track">
+              <div class="toggle-thumb"></div>
+            </div>
+            <span class="toggle-text">Auto play</span>
+          </div>
+          <div class="segmented">
+            <div class="segment active">Day</div>
+            <div class="segment">Week</div>
+            <div class="segment">Month</div>
+          </div>
+        </div>
+
+        <div class="dropdown" data-open="false">
+          <div class="dropdown-label">Sort by</div>
+          <div class="dropdown-value">Popularity</div>
+          <div class="dropdown-menu">
+            <div class="option">Popularity</div>
+            <div class="option">Recent</div>
+            <div class="option">Favorites</div>
+          </div>
+        </div>
+
+        <p class="hint">
+          Everything here is clickable, but none of it is focusable or announced
+          as a control by assistive technologies.
+        </p>
+      </section>
+    </main>
+
+    <script>
+      const toggle = document.querySelector('.toggle');
+      const segments = document.querySelectorAll('.segment');
+      const dropdown = document.querySelector('.dropdown');
+      const dropdownValue = dropdown.querySelector('.dropdown-value');
+
+      toggle.addEventListener('click', () => {
+        const isOn = toggle.classList.toggle('on');
+        toggle.dataset.state = isOn ? 'on' : 'off';
+      });
+
+      segments.forEach((segment) => {
+        segment.addEventListener('click', () => {
+          segments.forEach((item) => item.classList.remove('active'));
+          segment.classList.add('active');
+        });
+      });
+
+      dropdown.addEventListener('click', (event) => {
+        const option = event.target.closest('.option');
+        if (option) {
+          dropdownValue.textContent = option.textContent;
+          dropdown.classList.remove('open');
+          dropdown.dataset.open = 'false';
+          return;
+        }
+        const isOpen = dropdown.classList.toggle('open');
+        dropdown.dataset.open = isOpen ? 'true' : 'false';
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Icon-only Buttons (Missing Labels)</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main class="page">
+      <header class="header">
+        <p class="eyebrow">ARIA anti-pattern demo</p>
+        <h1>Icon-only Buttons</h1>
+        <p class="subtitle">
+          The toolbar below uses icons without accessible names. Screen readers
+          announce these as unlabeled buttons.
+        </p>
+      </header>
+
+      <section class="card">
+        <h2>Quick actions</h2>
+        <div class="toolbar">
+          <button class="icon-button" type="button">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <circle cx="10" cy="10" r="6"></circle>
+              <line x1="15" y1="15" x2="21" y2="21"></line>
+            </svg>
+          </button>
+          <button class="icon-button" type="button">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <line x1="4" y1="7" x2="20" y2="7"></line>
+              <line x1="4" y1="12" x2="20" y2="12"></line>
+              <line x1="4" y1="17" x2="20" y2="17"></line>
+            </svg>
+          </button>
+          <button class="icon-button" type="button">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12 20s-6-4.3-8.4-7.4C1.6 9.1 3.4 6 6.3 6c1.8 0 3.3 1 4.7 2.6C12.3 7 13.9 6 15.7 6c2.9 0 4.7 3.1 2.7 6.6C18 15.7 12 20 12 20z"></path>
+            </svg>
+          </button>
+          <button class="icon-button" type="button">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <circle cx="9" cy="20" r="1.5"></circle>
+              <circle cx="17" cy="20" r="1.5"></circle>
+              <path d="M3 4h2l2.4 11h10.6l2-7H7.2"></path>
+            </svg>
+          </button>
+        </div>
+        <p class="hint">
+          These icon buttons look obvious to sighted users, but they do not have
+          text, aria-labels, or other accessible names.
+        </p>
+      </section>
+
+      <section class="card">
+        <h2>Action cards</h2>
+        <div class="grid">
+          <article class="panel">
+            <h3>Project Alpha</h3>
+            <p>Status: Draft</p>
+            <div class="panel-actions">
+              <button class="icon-button" type="button">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <rect x="4" y="5" width="16" height="14" rx="2"></rect>
+                  <line x1="8" y1="9" x2="16" y2="9"></line>
+                  <line x1="8" y1="13" x2="14" y2="13"></line>
+                </svg>
+              </button>
+              <button class="icon-button" type="button">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M6 7h12"></path>
+                  <path d="M10 7V5h4v2"></path>
+                  <rect x="7" y="7" width="10" height="12" rx="2"></rect>
+                </svg>
+              </button>
+            </div>
+          </article>
+          <article class="panel">
+            <h3>Project Beta</h3>
+            <p>Status: Live</p>
+            <div class="panel-actions">
+              <button class="icon-button" type="button">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <polygon points="8,5 19,12 8,19"></polygon>
+                </svg>
+              </button>
+              <button class="icon-button" type="button">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <circle cx="12" cy="12" r="7"></circle>
+                  <line x1="12" y1="9" x2="12" y2="12"></line>
+                  <circle cx="12" cy="15" r="1"></circle>
+                </svg>
+              </button>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

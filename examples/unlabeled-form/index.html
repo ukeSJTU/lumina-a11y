@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Unlabeled Form Fields</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main class="page">
+      <header class="header">
+        <p class="eyebrow">ARIA anti-pattern demo</p>
+        <h1>Unlabeled Form Fields</h1>
+        <p class="subtitle">
+          This form uses placeholders instead of associated labels. Screen
+          readers do not get reliable field names.
+        </p>
+      </header>
+
+      <section class="card">
+        <h2>Create your account</h2>
+        <form class="form">
+          <div class="field">
+            <input type="text" name="full_name" placeholder="Full name">
+          </div>
+          <div class="field">
+            <input type="email" name="email" placeholder="Email address">
+          </div>
+          <div class="field">
+            <input type="password" name="password" placeholder="Password">
+          </div>
+          <div class="field">
+            <input type="text" name="company" placeholder="Company">
+          </div>
+          <div class="field">
+            <textarea name="notes" rows="4" placeholder="Tell us about your team"></textarea>
+          </div>
+          <button class="primary" type="button">Create account</button>
+        </form>
+        <p class="hint">
+          Notice there are no <code>&lt;label&gt;</code> elements or
+          <code>aria-label</code> attributes tied to these fields.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>
