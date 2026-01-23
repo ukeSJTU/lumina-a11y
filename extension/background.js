@@ -59,7 +59,7 @@ function delay(ms) {
 }
 
 async function requestGemini(apiKey, base64Image, mapping) {
-  const endpoint = `${API_BASE}/${MODEL_NAME}:generateContent?key=${encodeURIComponent(apiKey)}`;
+  const endpoint = buildEndpoint(apiKey);
   const prompt = buildPrompt(mapping);
 
   const body = {
@@ -91,12 +91,17 @@ async function requestGemini(apiKey, base64Image, mapping) {
     body: JSON.stringify(body)
   });
 
+  const responseText = await response.text();
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Gemini error ${response.status}: ${errorText}`);
+    throw new Error(`Gemini error ${response.status}: ${trimResponse(responseText)}`);
   }
 
-  const rawResponse = await response.json();
+  let rawResponse;
+  try {
+    rawResponse = JSON.parse(responseText);
+  } catch (error) {
+    throw new Error(`Gemini returned non-JSON response: ${trimResponse(responseText)}`);
+  }
   const rawText = extractResponseText(rawResponse);
 
   return { rawResponse, rawText };
@@ -118,6 +123,29 @@ async function injectContentScript(tabId) {
     target: { tabId },
     files: ['content.js']
   });
+}
+
+function buildEndpoint(apiKey) {
+  const baseUrl = new URL(API_BASE);
+  let basePath = baseUrl.pathname.replace(/\/+$/, '');
+  if (!basePath || basePath === '/') {
+    basePath = '/v1beta/models';
+  }
+  baseUrl.pathname = `${basePath}/${MODEL_NAME}:generateContent`;
+  baseUrl.search = '';
+  baseUrl.searchParams.set('key', apiKey);
+  return baseUrl.toString();
+}
+
+function trimResponse(text) {
+  const trimmed = text ? text.trim() : '';
+  if (!trimmed) {
+    return '(empty response)';
+  }
+  if (trimmed.length > 500) {
+    return `${trimmed.slice(0, 500)}...`;
+  }
+  return trimmed;
 }
 
 function isNoReceiverError(error) {
