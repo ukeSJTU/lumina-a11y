@@ -40,8 +40,15 @@ lumina-a11y/
 │   └── popup/          # UI for settings (API Key management)
 │
 ├── examples/           # "Bad" websites for demonstration purposes
-│   ├── index.html      # A webpage intentionally stripped of accessibility tags
-│   └── style.css
+│   ├── icon-only-buttons/
+│   │   ├── index.html  # Icon-only controls with missing accessible names
+│   │   └── style.css
+│   ├── unlabeled-form/
+│   │   ├── index.html  # Form fields without associated labels
+│   │   └── style.css
+│   └── custom-controls/
+│       ├── index.html  # Custom controls without semantic roles/keyboard support
+│       └── style.css
 │
 ├── justfile            # Command runner for development tasks
 └── README.md
@@ -84,23 +91,28 @@ cd lumina-a11y
 
 ## 🧪 How to Test (Demo)
 
-We have provided a "broken" website to demonstrate the power of WebIlluminator.
+We have provided a few "broken" websites to demonstrate the power of WebIlluminator.
 
-1. **Launch the Example Page:**
-   You can run a simple local server to view the example:
+1. **Launch an Example Page:**
+   You can run a simple local server to view one example:
 
 ```bash
-# If you have python installed
-python3 -m http.server 5500 --directory examples
+# With just
+just server icon-only-buttons
+
+# Or with python
+python3 -m http.server 5500 --directory examples/icon-only-buttons
 
 ```
 
-Open `http://localhost:5500` in your browser. You will see a page full of icons with no text labels.
+Replace `icon-only-buttons` with `unlabeled-form` or `custom-controls` to try the other demos. Open `http://localhost:5500` in your browser.
 
 2. **Verify the Issue:**
 
 - Open your browser's DevTools or turn on a screen reader (NVDA/VoiceOver).
-- Notice that buttons are just empty `<div>` or `<button>` tags.
+- `icon-only-buttons`: buttons have no accessible names.
+- `unlabeled-form`: inputs rely on placeholders with no associated labels.
+- `custom-controls`: interactive `<div>` elements have no roles or keyboard support.
 
 3. **Run the Repair:**
 
