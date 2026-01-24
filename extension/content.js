@@ -140,6 +140,7 @@ function createOverlay(id, rect) {
   const overlay = document.createElement('div');
   overlay.className = 'webilluminator-overlay';
   overlay.textContent = String(id);
+  overlay.setAttribute('aria-hidden', 'true');
   overlay.style.position = 'absolute';
   overlay.style.left = `${Math.max(0, rect.left + window.scrollX)}px`;
   overlay.style.top = `${Math.max(0, rect.top + window.scrollY)}px`;
