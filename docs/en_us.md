@@ -1,5 +1,9 @@
 # In-Depth Research Report on the Digital Accessibility Gap 2024-2026: Web Accessibility Defects, Characteristics of Blind and Low Vision User Groups, and the Evolution Path of AI-Assisted Technology
 
+**Language:** [中文](zh_cn.md) | **English**
+
+---
+
 ## Executive Summary
 
 As the internet becomes the core infrastructure of modern society, digital accessibility is no longer merely a compliance issue, but a social matter concerning the basic survival rights of hundreds of millions of people with visual impairments worldwide. This report aims to provide detailed theoretical foundations, market data, and technical pathway analysis for developing AI-based accessibility remediation tools.
