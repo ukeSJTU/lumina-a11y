@@ -46,8 +46,11 @@ lumina-a11y/
 │   ├── unlabeled-form/
 │   │   ├── index.html  # Form fields without associated labels
 │   │   └── style.css
-│   └── custom-controls/
-│       ├── index.html  # Custom controls without semantic roles/keyboard support
+│   ├── custom-controls/
+│   │   ├── index.html  # Custom controls without semantic roles/keyboard support
+│   │   └── style.css
+│   └── missing-alt-text/
+│       ├── index.html  # Images missing alt text, plus decorative/hidden examples
 │       └── style.css
 │
 ├── justfile            # Command runner for development tasks
@@ -105,7 +108,7 @@ python3 -m http.server 5500 --directory examples/icon-only-buttons
 
 ```
 
-Replace `icon-only-buttons` with `unlabeled-form` or `custom-controls` to try the other demos. Open `http://localhost:5500` in your browser.
+Replace `icon-only-buttons` with `unlabeled-form`, `custom-controls`, or `missing-alt-text` to try the other demos. Open `http://localhost:5500` in your browser.
 
 2. **Verify the Issue:**
 
@@ -113,12 +116,13 @@ Replace `icon-only-buttons` with `unlabeled-form` or `custom-controls` to try th
 - `icon-only-buttons`: buttons have no accessible names.
 - `unlabeled-form`: inputs rely on placeholders with no associated labels.
 - `custom-controls`: interactive `<div>` elements have no roles or keyboard support.
+- `missing-alt-text`: images omit `alt`, include decorative `alt=""`, and include images hidden with `aria-hidden="true"` (only the missing-alt images should be labeled).
 
 3. **Run the Repair:**
 
 - Click the WebIlluminator extension icon (or use the shortcut `Alt+R`).
 - Wait a few seconds for Gemini 3 to analyze the UI.
-- **Success!** The DOM is now patched. Inspect the elements again to see `aria-label="Search"`, `aria-label="Settings"`, etc.
+- **Success!** The DOM is now patched. Inspect the elements again to see `aria-label="Search"`, `aria-label="Settings"`, or `alt="Trailhead at sunrise"`.
 
 ---
 

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Images Missing Alt Text</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main class="page">
+      <header class="header">
+        <p class="eyebrow">ARIA anti-pattern demo</p>
+        <h1>Images Missing Alt Text</h1>
+        <p class="subtitle">
+          This page mixes images without alt text, decorative images, and images hidden
+          from accessibility to show how WebIlluminator responds to each case.
+        </p>
+      </header>
+
+      <div class="cards">
+        <section class="card">
+          <h2>Missing alt attributes</h2>
+          <div class="gallery">
+            <figure class="tile">
+              <img src="mountain.svg">
+              <figcaption>Trailhead at sunrise</figcaption>
+            </figure>
+            <figure class="tile">
+              <img src="market.svg">
+              <figcaption>Farmers market produce stall</figcaption>
+            </figure>
+          </div>
+          <p class="hint">
+            These images omit the <code>alt</code> attribute entirely and should receive
+            descriptive alt text.
+          </p>
+        </section>
+
+        <section class="card">
+          <h2>Decorative images</h2>
+          <div class="gallery">
+            <figure class="tile">
+              <img src="divider.svg" alt="">
+              <figcaption>Decorative divider (alt="")</figcaption>
+            </figure>
+          </div>
+          <p class="hint">These decorative images should be skipped.</p>
+        </section>
+
+        <section class="card">
+          <h2>Hidden from accessibility</h2>
+          <div class="gallery">
+            <figure class="tile">
+              <img src="forest.svg" aria-hidden="true">
+              <figcaption>Hidden from assistive technology</figcaption>
+            </figure>
+          </div>
+          <p class="hint">
+            This image is visible but removed from the accessibility tree and should be skipped.
+          </p>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>

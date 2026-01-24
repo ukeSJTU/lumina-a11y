@@ -27,7 +27,7 @@ function runScan() {
   let nextId = 1;
 
   for (const element of candidates) {
-    if (!isVisible(element) || hasAccessibleName(element)) {
+    if (!isVisible(element) || isIgnoredImage(element) || hasAccessibleName(element)) {
       continue;
     }
 
@@ -36,9 +36,16 @@ function runScan() {
     overlayState.idToElement.set(id, element);
 
     const rect = element.getBoundingClientRect();
-    const overlay = createOverlay(id, rect);
+    const badgeOffset = element.tagName === 'IMG' ? { x: 4, y: 4 } : { x: 0, y: 0 };
+    const overlay = createBadgeOverlay(id, rect, badgeOffset);
     overlayState.overlays.push(overlay);
     document.body.appendChild(overlay);
+
+    if (element.tagName === 'IMG') {
+      const outline = createImageOutline(rect);
+      overlayState.overlays.push(outline);
+      document.body.appendChild(outline);
+    }
 
     items.push({
       id,
@@ -53,6 +60,7 @@ function findCandidates() {
   const selector = [
     'button',
     'a[href]',
+    'img',
     'input',
     'select',
     'textarea',
@@ -76,12 +84,33 @@ function isVisible(element) {
   return rect.width > 0 && rect.height > 0;
 }
 
+function isIgnoredImage(element) {
+  if (element.tagName !== 'IMG') {
+    return false;
+  }
+
+  if (element.getAttribute('alt') === '') {
+    return true;
+  }
+
+  const role = element.getAttribute('role');
+  if (role === 'presentation') {
+    return true;
+  }
+
+  if (element.getAttribute('aria-hidden') === 'true') {
+    return true;
+  }
+
+  return false;
+}
+
 function hasAccessibleName(element) {
   if (element.hasAttribute('aria-label') || element.hasAttribute('aria-labelledby')) {
     return true;
   }
 
-  if (element.tagName === 'IMG' && element.getAttribute('alt')) {
+  if (element.tagName === 'IMG' && element.hasAttribute('alt')) {
     return true;
   }
 
@@ -133,17 +162,70 @@ function buildDescription(element) {
     parts.push(`class=${className.split(/\s+/).slice(0, 3).join(' ')}`);
   }
 
+  if (tag === 'img') {
+    const srcHint = getImageSourceHint(element.getAttribute('src'));
+    if (srcHint) {
+      parts.push(`src=${srcHint}`);
+    }
+    const title = normalizeText(element.getAttribute('title'), 60);
+    if (title) {
+      parts.push(`title=${title}`);
+    }
+    const caption = getImageCaption(element);
+    if (caption) {
+      parts.push(`caption=${caption}`);
+    }
+  }
+
   return parts.join(' ');
 }
 
-function createOverlay(id, rect) {
+function getImageSourceHint(src) {
+  if (!src) {
+    return '';
+  }
+  if (src.startsWith('data:')) {
+    return 'inline-image';
+  }
+  const trimmed = src.split('#')[0].split('?')[0];
+  const segments = trimmed.split('/');
+  return segments[segments.length - 1] || '';
+}
+
+function getImageCaption(image) {
+  const figure = image.closest('figure');
+  if (!figure) {
+    return '';
+  }
+  const caption = figure.querySelector('figcaption');
+  if (!caption) {
+    return '';
+  }
+  return normalizeText(caption.textContent, 80);
+}
+
+function normalizeText(text, maxLength) {
+  if (!text) {
+    return '';
+  }
+  const trimmed = text.trim().replace(/\s+/g, ' ');
+  if (!trimmed) {
+    return '';
+  }
+  if (trimmed.length <= maxLength) {
+    return trimmed;
+  }
+  return `${trimmed.slice(0, Math.max(0, maxLength - 3))}...`;
+}
+
+function createBadgeOverlay(id, rect, offset = { x: 0, y: 0 }) {
   const overlay = document.createElement('div');
   overlay.className = 'webilluminator-overlay';
   overlay.textContent = String(id);
   overlay.setAttribute('aria-hidden', 'true');
   overlay.style.position = 'absolute';
-  overlay.style.left = `${Math.max(0, rect.left + window.scrollX)}px`;
-  overlay.style.top = `${Math.max(0, rect.top + window.scrollY)}px`;
+  overlay.style.left = `${Math.max(0, rect.left + window.scrollX + (offset.x || 0))}px`;
+  overlay.style.top = `${Math.max(0, rect.top + window.scrollY + (offset.y || 0))}px`;
   overlay.style.padding = '2px 6px';
   overlay.style.background = '#0f172a';
   overlay.style.color = '#f8fafc';
@@ -154,6 +236,24 @@ function createOverlay(id, rect) {
   overlay.style.pointerEvents = 'none';
   overlay.style.boxShadow = '0 1px 4px rgba(0, 0, 0, 0.35)';
   return overlay;
+}
+
+function createImageOutline(rect) {
+  const outline = document.createElement('div');
+  outline.className = 'webilluminator-overlay webilluminator-outline';
+  outline.setAttribute('aria-hidden', 'true');
+  outline.style.position = 'absolute';
+  outline.style.left = `${Math.max(0, rect.left + window.scrollX)}px`;
+  outline.style.top = `${Math.max(0, rect.top + window.scrollY)}px`;
+  outline.style.width = `${Math.max(0, rect.width)}px`;
+  outline.style.height = `${Math.max(0, rect.height)}px`;
+  outline.style.border = '2px solid #38bdf8';
+  outline.style.borderRadius = '8px';
+  outline.style.boxSizing = 'border-box';
+  outline.style.background = 'transparent';
+  outline.style.zIndex = '2147483646';
+  outline.style.pointerEvents = 'none';
+  return outline;
 }
 
 function applyLabels(labels) {

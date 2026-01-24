@@ -157,8 +157,9 @@ function isNoReceiverError(error) {
 
 function buildPrompt(mapping) {
   const header = [
-    'You are labeling UI controls marked with numeric overlays in the screenshot.',
+    'You are labeling UI controls and images marked with numeric overlays in the screenshot.',
     'Return a JSON object mapping each id to a short accessible label.',
+    'For images, provide concise alt text.',
     'Use only the ids provided. Respond with JSON only, no markdown or commentary.'
   ].join('\n');
 
