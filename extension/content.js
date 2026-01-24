@@ -4,25 +4,32 @@ const overlayState = {
 };
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log('[Content] Received message:', message.type);
   if (message.type === 'scan-start') {
+    console.log('[Content] Starting scan...');
     const mapping = runScan();
+    console.log('[Content] Scan complete, found', mapping.count, 'elements');
     sendResponse({ ok: true, mapping });
     return;
   }
 
   if (message.type === 'apply-labels') {
+    console.log('[Content] Applying labels:', message.labels);
     if (message.rawText) {
-      console.log('Gemini response:', message.rawText);
+      console.log('[Content] Gemini response:', message.rawText);
     }
     applyLabels(message.labels || {});
+    console.log('[Content] Labels applied successfully');
     sendResponse({ ok: true });
   }
 });
 
 function runScan() {
+  console.log('[Content] Running scan...');
   clearOverlays();
 
   const candidates = findCandidates();
+  console.log('[Content] Found', candidates.length, 'candidate elements');
   const items = [];
   let nextId = 1;
 
@@ -34,6 +41,7 @@ function runScan() {
     const id = nextId++;
     element.setAttribute('data-webilluminator-id', String(id));
     overlayState.idToElement.set(id, element);
+    console.log('[Content] Added element', id, ':', element.tagName, buildDescription(element));
 
     const rect = element.getBoundingClientRect();
     const badgeOffset = element.tagName === 'IMG' ? { x: 4, y: 4 } : { x: 0, y: 0 };
@@ -53,6 +61,7 @@ function runScan() {
     });
   }
 
+  console.log('[Content] Scan complete, returning', items.length, 'items');
   return { items, count: items.length };
 }
 
@@ -257,31 +266,40 @@ function createImageOutline(rect) {
 }
 
 function applyLabels(labels) {
+  console.log('[Content] Applying', Object.keys(labels).length, 'labels');
   Object.entries(labels).forEach(([id, label]) => {
     const element = overlayState.idToElement.get(Number(id));
     if (!element) {
+      console.warn('[Content] Element not found for id:', id);
       return;
     }
     const trimmed = String(label || '').trim();
     if (!trimmed) {
+      console.warn('[Content] Empty label for id:', id);
       return;
     }
     if (element.tagName === 'IMG') {
+      console.log('[Content] Setting alt text for', id, ':', trimmed);
       element.setAttribute('alt', trimmed);
       return;
     }
+    console.log('[Content] Setting aria-label for', id, ':', trimmed);
     element.setAttribute('aria-label', trimmed);
   });
 
+  console.log('[Content] Clearing overlays');
   clearOverlays();
 }
 
 function clearOverlays() {
+  console.log('[Content] Clearing', overlayState.overlays.length, 'overlays');
   overlayState.overlays.forEach((overlay) => overlay.remove());
   overlayState.overlays = [];
   overlayState.idToElement.clear();
 
-  document.querySelectorAll('[data-webilluminator-id]').forEach((element) => {
+  const markedElements = document.querySelectorAll('[data-webilluminator-id]');
+  console.log('[Content] Removing', markedElements.length, 'element markers');
+  markedElements.forEach((element) => {
     element.removeAttribute('data-webilluminator-id');
   });
 }

@@ -4,7 +4,9 @@ const API_BASE = 'https://jp.duckcoding.com';
 const CAPTURE_DELAY_MS = 150;
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log('[Background] Received message:', message.type, message);
   if (message.type !== 'scan-active-tab') {
+    console.log('[Background] Ignoring non-scan message');
     return;
   }
 
@@ -19,34 +21,50 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 async function handleScanRequest() {
+  console.log('[Background] Starting scan request handler');
   const { apiKey } = await chrome.storage.local.get(['apiKey']);
   if (!apiKey) {
+    console.error('[Background] No API key found in storage');
     throw new Error('Missing API key.');
   }
+  console.log('[Background] API key found');
 
   const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  console.log('[Background] Active tab:', activeTab ? `id=${activeTab.id}, url=${activeTab.url}` : 'none');
   if (!activeTab || typeof activeTab.id !== 'number') {
+    console.error('[Background] No active tab found or invalid tab ID');
     throw new Error('No active tab found.');
   }
 
   let scanResult = await sendScanMessage(activeTab.id);
+  console.log('[Background] Initial scan result:', scanResult);
   if (!scanResult) {
+    console.log('[Background] Content script not present, injecting...');
     await injectContentScript(activeTab.id);
+    console.log('[Background] Content script injected, retrying scan...');
     scanResult = await sendScanMessage(activeTab.id);
+    console.log('[Background] Retry scan result:', scanResult);
   }
   if (!scanResult || !scanResult.ok) {
+    console.error('[Background] Scan failed:', scanResult);
     throw new Error(scanResult && scanResult.error ? scanResult.error : 'Scan failed.');
   }
+  console.log('[Background] Scan successful, found', scanResult.mapping?.count, 'elements');
 
   await delay(CAPTURE_DELAY_MS);
+  console.log('[Background] Capturing screenshot after', CAPTURE_DELAY_MS, 'ms delay');
 
   const screenshotUrl = await chrome.tabs.captureVisibleTab(activeTab.windowId, { format: 'png' });
   const base64Image = screenshotUrl.replace(/^data:image\/png;base64,/, '');
+  console.log('[Background] Screenshot captured, size:', base64Image.length, 'chars');
 
   const geminiResponse = await requestGemini(apiKey, base64Image, scanResult.mapping);
-  console.log('Gemini raw response:', geminiResponse.rawResponse);
+  console.log('[Background] Gemini raw response:', geminiResponse.rawResponse);
+  console.log('[Background] Gemini raw text:', geminiResponse.rawText);
 
   const labels = extractLabels(geminiResponse.rawText);
+  console.log('[Background] Extracted labels:', labels);
+  console.log('[Background] Sending labels to content script...');
   await chrome.tabs.sendMessage(activeTab.id, {
     type: 'apply-labels',
     rawText: geminiResponse.rawText,
@@ -59,8 +77,11 @@ function delay(ms) {
 }
 
 async function requestGemini(apiKey, base64Image, mapping) {
+  console.log('[Background] Requesting Gemini API...');
   const endpoint = buildEndpoint(apiKey);
+  console.log('[Background] Endpoint:', endpoint);
   const prompt = buildPrompt(mapping);
+  console.log('[Background] Prompt:', prompt);
 
   const body = {
     contents: [
@@ -83,6 +104,7 @@ async function requestGemini(apiKey, base64Image, mapping) {
     }
   };
 
+  console.log('[Background] Sending fetch request to Gemini...');
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
@@ -91,38 +113,57 @@ async function requestGemini(apiKey, base64Image, mapping) {
     body: JSON.stringify(body)
   });
 
+  console.log('[Background] Fetch response status:', response.status, response.statusText);
   const responseText = await response.text();
+  console.log('[Background] Response text length:', responseText.length);
   if (!response.ok) {
+    console.error('[Background] Gemini request failed:', response.status, trimResponse(responseText));
     throw new Error(`Gemini error ${response.status}: ${trimResponse(responseText)}`);
   }
 
   let rawResponse;
   try {
     rawResponse = JSON.parse(responseText);
+    console.log('[Background] Successfully parsed Gemini JSON response');
   } catch (error) {
+    console.error('[Background] Failed to parse Gemini response as JSON:', error);
     throw new Error(`Gemini returned non-JSON response: ${trimResponse(responseText)}`);
   }
   const rawText = extractResponseText(rawResponse);
+  console.log('[Background] Extracted text from response, length:', rawText?.length || 0);
 
   return { rawResponse, rawText };
 }
 
 async function sendScanMessage(tabId) {
+  console.log('[Background] Sending scan-start message to tab', tabId);
   try {
-    return await chrome.tabs.sendMessage(tabId, { type: 'scan-start' });
+    const result = await chrome.tabs.sendMessage(tabId, { type: 'scan-start' });
+    console.log('[Background] Scan message response:', result);
+    return result;
   } catch (error) {
+    console.log('[Background] Scan message error:', error.message);
     if (isNoReceiverError(error)) {
+      console.log('[Background] No receiver found (content script not loaded)');
       return null;
     }
+    console.error('[Background] Unexpected scan message error:', error);
     throw error;
   }
 }
 
 async function injectContentScript(tabId) {
-  await chrome.scripting.executeScript({
-    target: { tabId },
-    files: ['content.js']
-  });
+  console.log('[Background] Injecting content script into tab', tabId);
+  try {
+    await chrome.scripting.executeScript({
+      target: { tabId },
+      files: ['content.js']
+    });
+    console.log('[Background] Content script injection successful');
+  } catch (error) {
+    console.error('[Background] Content script injection failed:', error);
+    throw error;
+  }
 }
 
 function buildEndpoint(apiKey) {
@@ -176,17 +217,22 @@ function extractResponseText(rawResponse) {
 }
 
 function extractLabels(text) {
+  console.log('[Background] Extracting labels from text, length:', text?.length || 0);
   if (!text) {
+    console.log('[Background] No text to extract labels from');
     return {};
   }
 
   const match = text.match(/\{[\s\S]*\}/);
   if (!match) {
+    console.warn('[Background] No JSON object found in text');
     return {};
   }
+  console.log('[Background] Found JSON match:', match[0]);
 
   try {
     const parsed = JSON.parse(match[0]);
+    console.log('[Background] Parsed JSON:', parsed);
     if (Array.isArray(parsed)) {
       return parsed.reduce((acc, item) => {
         if (!item || item.id == null || !item.label) {
