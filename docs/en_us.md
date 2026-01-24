@@ -32,20 +32,20 @@ Through scanning millions of webpages, research found that **96.4%** of detected
 
 The following table details the occurrence rates of these six major error categories and their specific impacts on screen reader users:
 
-| Error Category (WCAG Failure Type) | Occurrence Rate (% of homepages) | Specific Impact on Visually Impaired Users and Technical Challenges |
-|:------------------------------------|:--------------------------------|:--------------------------------------------------------------------|
-| **Low Contrast Text** | 81.0% | **Impact**: Low vision users cannot distinguish text. **AI Challenge**: Requires precise calculation of brightness ratios between background and foreground pixels, and dynamic CSS adjustment without breaking UI aesthetics. |
-| **Missing Alt Text** | 54.5% | **Impact**: Screen readers only read filenames (e.g., `img_123.jpg`), users lose all visual information. **AI Challenge**: Requires Computer Vision (CV) to understand image content (decorative vs. informational) and generate contextually appropriate descriptions. |
-| **Missing Form Labels** | 48.6% | **Impact**: Users don't know whether to fill in real name or username when focusing on input box. **AI Challenge**: Requires DOM spatial analysis or OCR to identify nearby visual text and associate it with `<input>`. |
-| **Empty Links** | 44.6% | **Impact**: Links contain only icons (e.g., FontAwesome), reader announces "link," user doesn't know destination. **AI Challenge**: Requires analysis of link's target URL or visual icon meaning to generate `aria-label`. |
-| **Empty Buttons** | 28.2% | **Impact**: Common in hamburger menus or search icons, users cannot operate core functions. **AI Challenge**: Requires UI component intent recognition. |
-| **Missing Document Language** | 17.1% | **Impact**: Screen readers cannot automatically switch pronunciation engines (e.g., reading Chinese with English accent), resulting in garbled pronunciation. **AI Challenge**: Relatively simple, use NLP to detect page's primary language and inject `lang` attribute. |
+| Error Category (WCAG Failure Type) | Occurrence Rate (% of homepages) | Specific Impact on Visually Impaired Users and Technical Challenges                                                                                                                                                                                                       |
+| :--------------------------------- | :------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Low Contrast Text**              | 81.0%                            | **Impact**: Low vision users cannot distinguish text. **AI Challenge**: Requires precise calculation of brightness ratios between background and foreground pixels, and dynamic CSS adjustment without breaking UI aesthetics.                                            |
+| **Missing Alt Text**               | 54.5%                            | **Impact**: Screen readers only read filenames (e.g., `img_123.jpg`), users lose all visual information. **AI Challenge**: Requires Computer Vision (CV) to understand image content (decorative vs. informational) and generate contextually appropriate descriptions.   |
+| **Missing Form Labels**            | 48.6%                            | **Impact**: Users don't know whether to fill in real name or username when focusing on input box. **AI Challenge**: Requires DOM spatial analysis or OCR to identify nearby visual text and associate it with `<input>`.                                                  |
+| **Empty Links**                    | 44.6%                            | **Impact**: Links contain only icons (e.g., FontAwesome), reader announces "link," user doesn't know destination. **AI Challenge**: Requires analysis of link's target URL or visual icon meaning to generate `aria-label`.                                               |
+| **Empty Buttons**                  | 28.2%                            | **Impact**: Common in hamburger menus or search icons, users cannot operate core functions. **AI Challenge**: Requires UI component intent recognition.                                                                                                                   |
+| **Missing Document Language**      | 17.1%                            | **Impact**: Screen readers cannot automatically switch pronunciation engines (e.g., reading Chinese with English accent), resulting in garbled pronunciation. **AI Challenge**: Relatively simple, use NLP to detect page's primary language and inject `lang` attribute. |
 
 **In-Depth Analysis: Popular Websites and the Complexity Paradox** User research often contains a misconception that "popular websites developed by large companies have better accessibility." However, data reveals the opposite conclusion. WebAIM's analysis points out that **the more popular and complex a website, the more accessibility errors it contains** ³.
 
-- **Element Explosion**: Top-ranked popular websites typically integrate numerous third-party scripts, ad trackers, dynamic widgets, and complex interaction frameworks. This complexity leads to chaotic DOM structures.
-- **ARIA Misuse**: ARIA (Accessible Rich Internet Applications) should be a bridge to assistive technology, but data shows that webpages using ARIA code have higher error rates than those not using ARIA. In 2024, ARIA usage increased by 15%, but pages averaged 18 instances of `aria-hidden="true"` (incorrectly hiding visible content) and 3.6 instances of `role="button"` (fake buttons lacking keyboard event support) ⁴.
-- **The Specificity of Popular Websites**: For visually impaired users, this means not only inability to access obscure blogs, but also facing more severe technical barriers in daily essential "popular" services such as shopping, banking, and social media than on regular webpages.
+-   **Element Explosion**: Top-ranked popular websites typically integrate numerous third-party scripts, ad trackers, dynamic widgets, and complex interaction frameworks. This complexity leads to chaotic DOM structures.
+-   **ARIA Misuse**: ARIA (Accessible Rich Internet Applications) should be a bridge to assistive technology, but data shows that webpages using ARIA code have higher error rates than those not using ARIA. In 2024, ARIA usage increased by 15%, but pages averaged 18 instances of `aria-hidden="true"` (incorrectly hiding visible content) and 3.6 instances of `role="button"` (fake buttons lacking keyboard event support) ⁴.
+-   **The Specificity of Popular Websites**: For visually impaired users, this means not only inability to access obscure blogs, but also facing more severe technical barriers in daily essential "popular" services such as shopping, banking, and social media than on regular webpages.
 
 ### 1.3 Invisible Barriers Created by Modern Front-End Frameworks (SPAs)
 
@@ -55,16 +55,16 @@ In addition to the explicit errors detectable by automated tools mentioned above
 
 In traditional multi-page applications, clicking a link to navigate causes the browser to refresh and default focus to the top of the page. But in SPAs, page content updates are accomplished by dynamically replacing DOM nodes with JavaScript, and the browser doesn't consider a "navigation" to have occurred.
 
-- **Phenomenon**: After a visually impaired user clicks the "next page" button, content has updated visually, but the screen reader's focus may still remain at the now-destroyed button position, or be reset to the `<body>` tag at the bottom of the page.
-- **Consequence**: Users become completely disoriented, don't know if the page has refreshed, and may even mistakenly believe the button didn't work and click repeatedly.
-- **AI Remediation Need**: Your program needs the ability to monitor DOM mutations (`MutationObserver`) and intelligently guide focus to the logical starting point (such as `<h1>` or main content container) when routes change ⁷.
+-   **Phenomenon**: After a visually impaired user clicks the "next page" button, content has updated visually, but the screen reader's focus may still remain at the now-destroyed button position, or be reset to the `<body>` tag at the bottom of the page.
+-   **Consequence**: Users become completely disoriented, don't know if the page has refreshed, and may even mistakenly believe the button didn't work and click repeatedly.
+-   **AI Remediation Need**: Your program needs the ability to monitor DOM mutations (`MutationObserver`) and intelligently guide focus to the logical starting point (such as `<h1>` or main content container) when routes change ⁷.
 
 #### Silent Updates of Dynamic Content
 
 Modern webpages extensively use asynchronous loading (AJAX). For example, real-time filtering of search results or shopping cart quantity updates.
 
-- **Phenomenon**: New search results appear visually, but because developers didn't add the `aria-live` attribute, screen readers remain silent, unaware of the change.
-- **Consequence**: Users don't know the system has responded to their action.
+-   **Phenomenon**: New search results appear visually, but because developers didn't add the `aria-live` attribute, screen readers remain silent, unaware of the change.
+-   **Consequence**: Users don't know the system has responded to their action.
 
 ### 1.4 The "Black Hole" of Images and Multimedia
 
@@ -80,11 +80,11 @@ After clarifying "webpage-side" problems, we need to examine "user-side" scale a
 
 According to the latest data (2024/2025) from the World Health Organization (WHO) and related epidemiological research, the global population with visual impairments is massive, and this number is rising with accelerating population aging.
 
-- **Overall Scale**: Globally, at least **2.2 billion** people have near or distance vision impairment ⁹.
-- **Core Target Users (Screen Reader Users)**:
-  - **Blindness**: Approximately **43 million** people ¹⁰. This group completely relies on screen readers and is your tool's most core audience.
-  - **Moderate to Severe Visual Impairment (MSVI)**: Approximately **295 million** people ¹⁰. This group typically uses a combination of screen magnifiers and screen readers, and is extremely sensitive to color contrast and layout clarity.
-- **Uncorrected Refractive Errors**: Notably, approximately 157 million people's visual impairment stems from uncorrected refractive problems, and this population has grown by 72% since 2000 ¹¹. This indicates that visual impairment is not limited to medically underserved areas; in modern society highly dependent on electronic screens, vision degradation is a universal phenomenon.
+-   **Overall Scale**: Globally, at least **2.2 billion** people have near or distance vision impairment ⁹.
+-   **Core Target Users (Screen Reader Users)**:
+    -   **Blindness**: Approximately **43 million** people ¹⁰. This group completely relies on screen readers and is your tool's most core audience.
+    -   **Moderate to Severe Visual Impairment (MSVI)**: Approximately **295 million** people ¹⁰. This group typically uses a combination of screen magnifiers and screen readers, and is extremely sensitive to color contrast and layout clarity.
+-   **Uncorrected Refractive Errors**: Notably, approximately 157 million people's visual impairment stems from uncorrected refractive problems, and this population has grown by 72% since 2000 ¹¹. This indicates that visual impairment is not limited to medically underserved areas; in modern society highly dependent on electronic screens, vision degradation is a universal phenomenon.
 
 ### 2.2 The "Silver Tsunami": Aging User Structure
 
@@ -100,8 +100,8 @@ This trend presents special requirements for tool development:
 
 While WebAIM's data primarily targets desktop webpages, user behavior has fundamentally shifted. **91.3%** of screen reader users report using mobile devices (phones/tablets) for assistive reading ¹³.
 
-- **Cross-Platform Gap**: Many webpages are barely usable on desktop but often hide labels, overlap elements, or make touch targets too small on mobile (responsive layouts).
-- **App Preference**: Due to extremely poor mobile web experiences, 58% of users prefer using native apps rather than webpages for banking or shopping ¹⁴. This conversely proves the failure of web accessibility—users are forced to flee the web.
+-   **Cross-Platform Gap**: Many webpages are barely usable on desktop but often hide labels, overlap elements, or make touch targets too small on mobile (responsive layouts).
+-   **App Preference**: Due to extremely poor mobile web experiences, 58% of users prefer using native apps rather than webpages for banking or shopping ¹⁴. This conversely proves the failure of web accessibility—users are forced to flee the web.
 
 ---
 
@@ -113,12 +113,12 @@ To make your program work synergistically with existing assistive tools, you mus
 
 According to WebAIM Screen Reader Survey #10 (2024) data, the market shows distinct regional and platform characteristics ¹⁴:
 
-| Screen Reader | Platform | Primary Usage Rate | Commonly Used Rate | Notes |
-|:--------------|:---------|:-------------------|:-------------------|:------|
-| **JAWS** | Windows | 40.5% | 60.5% | Commercial software, expensive, dominant in North America and corporate workplaces. |
-| **NVDA** | Windows | 37.7% | 65.6% | Open-source and free, most popular globally (especially in Europe, Asia, and developing regions), total user base has surpassed JAWS. |
-| **VoiceOver** | macOS / iOS | 9.7% | 43.9% | Built into Apple ecosystem, absolute monopoly on mobile. |
-| **Narrator** | Windows | 0.7% | 37.3% | Built into Windows, few users as primary tool, but increasing usage rate as backup. |
+| Screen Reader | Platform    | Primary Usage Rate | Commonly Used Rate | Notes                                                                                                                                 |
+| :------------ | :---------- | :----------------- | :----------------- | :------------------------------------------------------------------------------------------------------------------------------------ |
+| **JAWS**      | Windows     | 40.5%              | 60.5%              | Commercial software, expensive, dominant in North America and corporate workplaces.                                                   |
+| **NVDA**      | Windows     | 37.7%              | 65.6%              | Open-source and free, most popular globally (especially in Europe, Asia, and developing regions), total user base has surpassed JAWS. |
+| **VoiceOver** | macOS / iOS | 9.7%               | 43.9%              | Built into Apple ecosystem, absolute monopoly on mobile.                                                                              |
+| **Narrator**  | Windows     | 0.7%               | 37.3%              | Built into Windows, few users as primary tool, but increasing usage rate as backup.                                                   |
 
 #### Implications for Development
 
@@ -131,8 +131,8 @@ Visually impaired users don't read webpages linearly; they have a unique informa
 
 **Core Navigation Pattern: Headings** **71.6%** of users use headings (H1-H6) as the primary way to jump and find information on pages ¹⁵.
 
-- **Pain Point**: As mentioned earlier, 39% of webpages have heading hierarchy jumps or are missing.
-- **Opportunity**: If your AI can only do one thing, restructuring a page's heading structure (inferring logical structure from visual font size and layout and injecting `<h1>` tags, etc.) will solve over 70% of navigation challenges.
+-   **Pain Point**: As mentioned earlier, 39% of webpages have heading hierarchy jumps or are missing.
+-   **Opportunity**: If your AI can only do one thing, restructuring a page's heading structure (inferring logical structure from visual font size and layout and injecting `<h1>` tags, etc.) will solve over 70% of navigation challenges.
 
 #### Coping Mechanisms: Abandonment and Help-Seeking
 
@@ -140,9 +140,9 @@ When users encounter inaccessible webpages, how do they solve it?
 
 1. **Abandonment**: This is the most common reaction. Due to lack of alternatives, users can only leave the website and seek competitors' services. Less than 10% of users frequently contact website administrators to report problems ¹⁴. This means website owners are often completely unaware of lost users with disabilities.
 2. **Human/AI Visual Assistance**: In recent years, users have begun turning to **Be My Eyes** (connecting to volunteer video calls) or its built-in **Be My AI** (based on GPT-4 Vision) to "see" screens.
-   - **Be My AI**: Users take screenshots and ask AI "What's in this image?" or "What does this button do?" ¹⁶.
-   - **JAWS Picture Smart**: JAWS integrates AI functionality, allowing users to analyze the current window or image via shortcuts ¹⁸.
-   - **Limitations**: These solutions are mostly "workaround" solutions—they tell users what's on screen but don't **fix** the DOM itself. Users still cannot directly click that unlabeled button and can only simulate mouse clicks through OCR (Optical Character Recognition), which is extremely inefficient.
+    - **Be My AI**: Users take screenshots and ask AI "What's in this image?" or "What does this button do?" ¹⁶.
+    - **JAWS Picture Smart**: JAWS integrates AI functionality, allowing users to analyze the current window or image via shortcuts ¹⁸.
+    - **Limitations**: These solutions are mostly "workaround" solutions—they tell users what's on screen but don't **fix** the DOM itself. Users still cannot directly click that unlabeled button and can only simulate mouse clicks through OCR (Optical Character Recognition), which is extremely inefficient.
 
 ---
 
@@ -166,27 +166,27 @@ Synthesizing the above research, a truly effective AI accessibility remediation 
 
 1. **Semantic Understanding Rather Than Heuristic Guessing**
 
-   Traditional remediation scripts rely on simple rules (such as "if there's an image, add an `alt` tag"). Next-generation tools must utilize **Multimodal AI**.
+    Traditional remediation scripts rely on simple rules (such as "if there's an image, add an `alt` tag"). Next-generation tools must utilize **Multimodal AI**.
 
-   - **Scenario**: A button with only a magnifying glass icon.
-   - **Traditional Script**: Labeled as "magnifying glass" or "icon." (User confusion: What is the magnifying glass for?)
-   - **AI Capability**: Combining icon visual features, surrounding text (such as "Please enter search term"), and HTML class name (`class="search-btn"`), comprehensively determine its intent and inject `aria-label="Search"`.
+    - **Scenario**: A button with only a magnifying glass icon.
+    - **Traditional Script**: Labeled as "magnifying glass" or "icon." (User confusion: What is the magnifying glass for?)
+    - **AI Capability**: Combining icon visual features, surrounding text (such as "Please enter search term"), and HTML class name (`class="search-btn"`), comprehensively determine its intent and inject `aria-label="Search"`.
 
 2. **Dynamic DOM Monitoring (Mutation Observation)**
 
-   For frameworks like React/Vue, the program cannot be a one-time script. Must implement efficient `MutationObserver` mechanism.
+    For frameworks like React/Vue, the program cannot be a one-time script. Must implement efficient `MutationObserver` mechanism.
 
-   - **Technical Requirements**: Monitor child node changes in the DOM tree. When new content (such as popups, dropdown menus) is inserted into the DOM, intercept at millisecond-level and inject accessibility attributes, ensuring screen readers can capture changes immediately.
+    - **Technical Requirements**: Monitor child node changes in the DOM tree. When new content (such as popups, dropdown menus) is inserted into the DOM, intercept at millisecond-level and inject accessibility attributes, ensuring screen readers can capture changes immediately.
 
 3. **Shadow DOM Penetration**
 
-   Modern Web Components often encapsulate structure in Shadow DOM, which is often a blind spot for traditional scanning tools. Your tool must have the ability to traverse Shadow Roots, ensuring buttons and labels encapsulated inside components can also be fixed.
+    Modern Web Components often encapsulate structure in Shadow DOM, which is often a blind spot for traditional scanning tools. Your tool must have the ability to traverse Shadow Roots, ensuring buttons and labels encapsulated inside components can also be fixed.
 
 4. **Balancing Privacy and Performance**
 
-   Since real-time page content analysis is required, if AI models run entirely in the cloud (sending HTML/screenshots to servers), it will raise serious privacy concerns (such as bank page data leakage) and latency.
+    Since real-time page content analysis is required, if AI models run entirely in the cloud (sending HTML/screenshots to servers), it will raise serious privacy concerns (such as bank page data leakage) and latency.
 
-   - **Trend**: Explore **on-device small models (On-device Small Language Models)** or browser-built AI capabilities (such as Chrome Nano Gemini) to complete basic label prediction and structure remediation locally, calling cloud APIs only when necessary (such as complex image descriptions).
+    - **Trend**: Explore **on-device small models (On-device Small Language Models)** or browser-built AI capabilities (such as Chrome Nano Gemini) to complete basic label prediction and structure remediation locally, calling cloud APIs only when necessary (such as complex image descriptions).
 
 ---
 
@@ -198,9 +198,9 @@ This study reaches the following core conclusions:
 
 1. **Market Pain Points Are Extremely Clear**: Current commonly used websites have enormous gaps in image descriptions, form labels, link intent, and SPA interaction logic. Existing Overlay solutions are rejected by the community due to poor experience and high legal risks.
 2. **Technical Entry Points**: Don't create "universal" overlays, but focus on **Intelligent Remediation Agents**. Focus on:
-   - Using vision models to generate meaningful Alt Text for hundreds of millions of unlabeled images.
-   - Completing `aria-label` for "empty links" and "empty buttons" through intent recognition.
-   - Building runtime scripts for React/Vue, taking over focus management, and fixing SPA navigation experiences.
+    - Using vision models to generate meaningful Alt Text for hundreds of millions of unlabeled images.
+    - Completing `aria-label` for "empty links" and "empty buttons" through intent recognition.
+    - Building runtime scripts for React/Vue, taking over focus management, and fixing SPA navigation experiences.
 3. **User-Oriented**: Given the high usage rates of NVDA and mobile devices, your tool should prioritize running as a **browser extension** or **system-level assistive service** rather than code that forces website administrators to install. Empowering the user-agent side, letting users take control of webpage remediation, is the main technical trend for the coming years.
 
 By filling the "cognitive understanding" gap that automated code scanning cannot cover, your program has the potential to rebuild an understandable and operable internet for tens of millions of screen reader-dependent users.
@@ -209,17 +209,17 @@ By filling the "cognitive understanding" gap that automated code scanning cannot
 
 ## Data Source Index Cited in This Report
 
-- ¹ WebAIM Million Report 2024
-- ⁴ WebAIM Million Report Detailed Statistics
-- ³ AudioEye WebAIM 2024 Takeaways
-- ² WebAIM Mailing List Discussion 2024
-- ¹² WebAIM Screen Reader Survey #10
-- ⁹ WHO & Global Burden of Disease Vision Impairment Statistics
-- ²⁰ UsableNet & Accessibility Legal Reports
-- ⁸ AudioEye Accessibility Statistics
-- ¹⁴ WebAIM Survey Qualitative Analysis
-- ¹⁶ Be My Eyes / Be My AI Technical Documentation
-- ⁵ Technical Analysis of SPA Accessibility Challenges
+-   ¹ WebAIM Million Report 2024
+-   ⁴ WebAIM Million Report Detailed Statistics
+-   ³ AudioEye WebAIM 2024 Takeaways
+-   ² WebAIM Mailing List Discussion 2024
+-   ¹² WebAIM Screen Reader Survey #10
+-   ⁹ WHO & Global Burden of Disease Vision Impairment Statistics
+-   ²⁰ UsableNet & Accessibility Legal Reports
+-   ⁸ AudioEye Accessibility Statistics
+-   ¹⁴ WebAIM Survey Qualitative Analysis
+-   ¹⁶ Be My Eyes / Be My AI Technical Documentation
+-   ⁵ Technical Analysis of SPA Accessibility Challenges
 
 ### References
 
