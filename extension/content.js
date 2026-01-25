@@ -33,7 +33,8 @@ function runScan() {
   const items = [];
   let nextId = 1;
 
-  for (const element of candidates) {
+  for (const candidate of candidates) {
+    const { element, hostChain } = candidate;
     if (!isVisible(element) || isIgnoredImage(element) || hasAccessibleName(element)) {
       continue;
     }
@@ -41,7 +42,7 @@ function runScan() {
     const id = nextId++;
     element.setAttribute('data-webilluminator-id', String(id));
     overlayState.idToElement.set(id, element);
-    console.log('[Content] Added element', id, ':', element.tagName, buildDescription(element));
+    console.log('[Content] Added element', id, ':', element.tagName, buildDescription(element, hostChain));
 
     const rect = element.getBoundingClientRect();
     const badgeOffset = element.tagName === 'IMG' ? { x: 4, y: 4 } : { x: 0, y: 0 };
@@ -57,7 +58,7 @@ function runScan() {
 
     items.push({
       id,
-      description: buildDescription(element)
+      description: buildDescription(element, hostChain)
     });
   }
 
@@ -80,8 +81,45 @@ function findCandidates() {
     '[role="tab"]'
   ].join(',');
 
-  const elements = Array.from(document.querySelectorAll(selector));
-  return elements.filter((element) => !element.closest('.webilluminator-overlay'));
+  const candidates = [];
+  const seen = new Set();
+  const roots = collectScanRoots();
+
+  roots.forEach(({ root, hostChain }) => {
+    const elements = Array.from(root.querySelectorAll(selector));
+    elements.forEach((element) => {
+      if (seen.has(element) || element.closest('.webilluminator-overlay')) {
+        return;
+      }
+      seen.add(element);
+      candidates.push({ element, hostChain });
+    });
+  });
+
+  return candidates;
+}
+
+function collectScanRoots() {
+  const roots = [];
+  const visited = new Set();
+
+  function walk(root, hostChain) {
+    if (!root || visited.has(root)) {
+      return;
+    }
+    visited.add(root);
+    roots.push({ root, hostChain });
+
+    const elements = root.querySelectorAll ? root.querySelectorAll('*') : [];
+    elements.forEach((element) => {
+      if (element.shadowRoot) {
+        walk(element.shadowRoot, hostChain.concat(element));
+      }
+    });
+  }
+
+  walk(document, []);
+  return roots;
 }
 
 function isVisible(element) {
@@ -142,7 +180,7 @@ function hasAccessibleName(element) {
   return false;
 }
 
-function buildDescription(element) {
+function buildDescription(element, hostChain = []) {
   const tag = element.tagName.toLowerCase();
   const parts = [`tag=${tag}`];
   const role = element.getAttribute('role');
@@ -171,6 +209,11 @@ function buildDescription(element) {
     parts.push(`class=${className.split(/\s+/).slice(0, 3).join(' ')}`);
   }
 
+  const shadowHostPath = buildShadowHostPath(hostChain);
+  if (shadowHostPath) {
+    parts.push(`shadowHost=${shadowHostPath}`);
+  }
+
   if (tag === 'img') {
     const srcHint = getImageSourceHint(element.getAttribute('src'));
     if (srcHint) {
@@ -187,6 +230,26 @@ function buildDescription(element) {
   }
 
   return parts.join(' ');
+}
+
+function buildShadowHostPath(hostChain) {
+  if (!hostChain.length) {
+    return '';
+  }
+  return hostChain.map(describeShadowHost).join('>');
+}
+
+function describeShadowHost(host) {
+  const tag = host.tagName.toLowerCase();
+  const id = host.id ? `#${host.id}` : '';
+  let classHint = '';
+  if (typeof host.className === 'string') {
+    const classes = host.className.trim().split(/\s+/).filter(Boolean);
+    if (classes.length) {
+      classHint = `.${classes[0]}`;
+    }
+  }
+  return `${tag}${id}${classHint}`;
 }
 
 function getImageSourceHint(src) {
@@ -297,9 +360,14 @@ function clearOverlays() {
   overlayState.overlays = [];
   overlayState.idToElement.clear();
 
-  const markedElements = document.querySelectorAll('[data-webilluminator-id]');
-  console.log('[Content] Removing', markedElements.length, 'element markers');
-  markedElements.forEach((element) => {
-    element.removeAttribute('data-webilluminator-id');
+  const roots = collectScanRoots();
+  let markerCount = 0;
+  roots.forEach(({ root }) => {
+    const markedElements = root.querySelectorAll('[data-webilluminator-id]');
+    markerCount += markedElements.length;
+    markedElements.forEach((element) => {
+      element.removeAttribute('data-webilluminator-id');
+    });
   });
+  console.log('[Content] Removing', markerCount, 'element markers');
 }
