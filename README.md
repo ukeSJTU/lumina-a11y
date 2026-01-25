@@ -27,6 +27,14 @@ WebIlluminator solves this using a **Visual Indexing** (Set-of-Marks) approach:
 
 ---
 
+## 🎥 Demo Video
+
+[![WebIlluminator demo video thumbnail](./assets/demo-video-thumbnail.png)](https://github.com/ukeSJTU/lumina-a11y/releases/download/demo-video-v0.1.0/webilluminator-demo.mp4)
+
+Versioning details: [docs/versioning.md](./docs/versioning.md)
+
+---
+
 ## 📂 Project Structure
 
 This repository is organized as follows:
