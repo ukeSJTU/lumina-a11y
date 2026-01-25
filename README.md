@@ -34,6 +34,7 @@ This repository is organized as follows:
 ```text
 lumina-a11y/
 ├── demo/               # Remotion video source files for the project demo
+├── docs/               # Project-related documents and research report
 ├── extension/          # The source code for the Chrome Extension (Manifest V3)
 │   ├── manifest.json   # Extension configuration
 │   ├── background.js   # Handles API calls to Google Gemini
