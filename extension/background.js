@@ -5,23 +5,42 @@ const CAPTURE_DELAY_MS = 150;
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log('[Background] Received message:', message.type, message);
-  if (message.type !== 'scan-active-tab') {
-    console.log('[Background] Ignoring non-scan message');
-    return;
+  if (message.type === 'scan-active-tab') {
+    handleScanOnly()
+      .then(() => sendResponse({ ok: true }))
+      .catch((error) => {
+        console.error('Scan failed:', error);
+        sendResponse({ ok: false, error: error.message || 'Scan failed' });
+      });
+    return true;
   }
 
-  handleScanRequest()
-    .then(() => sendResponse({ ok: true }))
-    .catch((error) => {
-      console.error('Scan failed:', error);
-      sendResponse({ ok: false, error: error.message || 'Scan failed' });
-    });
+  if (message.type === 'fix-active-tab') {
+    handleFixRequest()
+      .then(() => sendResponse({ ok: true }))
+      .catch((error) => {
+        console.error('Fix failed:', error);
+        sendResponse({ ok: false, error: error.message || 'Fix failed' });
+      });
+    return true;
+  }
 
-  return true;
+  console.log('[Background] Ignoring non-scan message');
 });
 
-async function handleScanRequest() {
-  console.log('[Background] Starting scan request handler');
+async function handleScanOnly() {
+  console.log('[Background] Starting scan-only request handler');
+  const activeTab = await getActiveTab();
+  const scanResult = await ensureContentMessage(activeTab.id, { type: 'scan-start' });
+  if (!scanResult || !scanResult.ok) {
+    console.error('[Background] Scan failed:', scanResult);
+    throw new Error(scanResult && scanResult.error ? scanResult.error : 'Scan failed.');
+  }
+  console.log('[Background] Scan preview complete, found', scanResult.mapping?.count, 'elements');
+}
+
+async function handleFixRequest() {
+  console.log('[Background] Starting fix request handler');
   const { apiKey } = await chrome.storage.local.get(['apiKey']);
   if (!apiKey) {
     console.error('[Background] No API key found in storage');
@@ -29,27 +48,9 @@ async function handleScanRequest() {
   }
   console.log('[Background] API key found');
 
-  const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  console.log('[Background] Active tab:', activeTab ? `id=${activeTab.id}, url=${activeTab.url}` : 'none');
-  if (!activeTab || typeof activeTab.id !== 'number') {
-    console.error('[Background] No active tab found or invalid tab ID');
-    throw new Error('No active tab found.');
-  }
-
-  let scanResult = await sendScanMessage(activeTab.id);
-  console.log('[Background] Initial scan result:', scanResult);
-  if (!scanResult) {
-    console.log('[Background] Content script not present, injecting...');
-    await injectContentScript(activeTab.id);
-    console.log('[Background] Content script injected, retrying scan...');
-    scanResult = await sendScanMessage(activeTab.id);
-    console.log('[Background] Retry scan result:', scanResult);
-  }
-  if (!scanResult || !scanResult.ok) {
-    console.error('[Background] Scan failed:', scanResult);
-    throw new Error(scanResult && scanResult.error ? scanResult.error : 'Scan failed.');
-  }
-  console.log('[Background] Scan successful, found', scanResult.mapping?.count, 'elements');
+  const activeTab = await getActiveTab();
+  const mapping = await getOrCreateScanMapping(activeTab.id);
+  console.log('[Background] Fix mapping ready, found', mapping?.count ?? 0, 'elements');
 
   await delay(CAPTURE_DELAY_MS);
   console.log('[Background] Capturing screenshot after', CAPTURE_DELAY_MS, 'ms delay');
@@ -58,7 +59,7 @@ async function handleScanRequest() {
   const base64Image = screenshotUrl.replace(/^data:image\/png;base64,/, '');
   console.log('[Background] Screenshot captured, size:', base64Image.length, 'chars');
 
-  const geminiResponse = await requestGemini(apiKey, base64Image, scanResult.mapping);
+  const geminiResponse = await requestGemini(apiKey, base64Image, mapping);
   console.log('[Background] Gemini raw response:', geminiResponse.rawResponse);
   console.log('[Background] Gemini raw text:', geminiResponse.rawText);
 
@@ -70,6 +71,32 @@ async function handleScanRequest() {
     rawText: geminiResponse.rawText,
     labels
   });
+}
+
+async function getActiveTab() {
+  const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  console.log('[Background] Active tab:', activeTab ? `id=${activeTab.id}, url=${activeTab.url}` : 'none');
+  if (!activeTab || typeof activeTab.id !== 'number') {
+    console.error('[Background] No active tab found or invalid tab ID');
+    throw new Error('No active tab found.');
+  }
+  return activeTab;
+}
+
+async function getOrCreateScanMapping(tabId) {
+  const existing = await ensureContentMessage(tabId, { type: 'scan-get' });
+  if (existing && existing.ok && existing.mapping && Array.isArray(existing.mapping.items)) {
+    console.log('[Background] Using existing scan mapping');
+    return existing.mapping;
+  }
+
+  console.log('[Background] No prior scan mapping found; auto-scanning before repair.');
+  const scanResult = await ensureContentMessage(tabId, { type: 'scan-start' });
+  if (!scanResult || !scanResult.ok) {
+    console.error('[Background] Scan failed:', scanResult);
+    throw new Error(scanResult && scanResult.error ? scanResult.error : 'Scan failed.');
+  }
+  return scanResult.mapping;
 }
 
 function delay(ms) {
@@ -135,21 +162,32 @@ async function requestGemini(apiKey, base64Image, mapping) {
   return { rawResponse, rawText };
 }
 
-async function sendScanMessage(tabId) {
-  console.log('[Background] Sending scan-start message to tab', tabId);
+async function sendContentMessage(tabId, message) {
+  console.log('[Background] Sending message to tab', tabId, message.type);
   try {
-    const result = await chrome.tabs.sendMessage(tabId, { type: 'scan-start' });
-    console.log('[Background] Scan message response:', result);
+    const result = await chrome.tabs.sendMessage(tabId, message);
+    console.log('[Background] Message response:', result);
     return result;
   } catch (error) {
-    console.log('[Background] Scan message error:', error.message);
+    console.log('[Background] Message error:', error.message);
     if (isNoReceiverError(error)) {
       console.log('[Background] No receiver found (content script not loaded)');
       return null;
     }
-    console.error('[Background] Unexpected scan message error:', error);
+    console.error('[Background] Unexpected message error:', error);
     throw error;
   }
+}
+
+async function ensureContentMessage(tabId, message) {
+  let result = await sendContentMessage(tabId, message);
+  if (result === null) {
+    console.log('[Background] Content script not present, injecting...');
+    await injectContentScript(tabId);
+    console.log('[Background] Content script injected, retrying message...');
+    result = await sendContentMessage(tabId, message);
+  }
+  return result;
 }
 
 async function injectContentScript(tabId) {

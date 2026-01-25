@@ -1,6 +1,7 @@
 const apiKeyInput = document.getElementById('apiKey');
 const saveButton = document.getElementById('saveKey');
 const scanButton = document.getElementById('scanPage');
+const fixButton = document.getElementById('fixPage');
 const statusEl = document.getElementById('status');
 
 const STATUS_CLEAR_DELAY_MS = 2500;
@@ -59,11 +60,32 @@ function startScan() {
       return;
     }
     console.log('[Popup] Scan completed successfully');
-    setStatus('Scan running. Check console logs.');
+    setStatus('Scan complete. Check the page.');
+  });
+}
+
+function startFix() {
+  console.log('[Popup] Starting fix...');
+  setStatus('Starting fix...');
+  chrome.runtime.sendMessage({ type: 'fix-active-tab' }, (response) => {
+    if (chrome.runtime.lastError) {
+      console.error('[Popup] Fix error:', chrome.runtime.lastError);
+      setStatus(chrome.runtime.lastError.message || 'Fix failed to start.');
+      return;
+    }
+    console.log('[Popup] Fix response:', response);
+    if (!response || !response.ok) {
+      console.error('[Popup] Fix failed:', response);
+      setStatus(response && response.error ? response.error : 'Fix failed.');
+      return;
+    }
+    console.log('[Popup] Fix completed successfully');
+    setStatus('Fix complete.');
   });
 }
 
 saveButton.addEventListener('click', saveApiKey);
 scanButton.addEventListener('click', startScan);
+fixButton.addEventListener('click', startFix);
 
 loadApiKey();

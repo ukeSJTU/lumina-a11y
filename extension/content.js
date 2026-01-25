@@ -2,6 +2,7 @@ const overlayState = {
   overlays: [],
   idToElement: new Map()
 };
+let lastScanMapping = null;
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log('[Content] Received message:', message.type);
@@ -21,6 +22,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     applyLabels(message.labels || {});
     console.log('[Content] Labels applied successfully');
     sendResponse({ ok: true });
+  }
+
+  if (message.type === 'scan-get') {
+    console.log('[Content] Returning last scan mapping');
+    sendResponse({ ok: true, mapping: lastScanMapping });
   }
 });
 
@@ -63,7 +69,9 @@ function runScan() {
   }
 
   console.log('[Content] Scan complete, returning', items.length, 'items');
-  return { items, count: items.length };
+  const mapping = { items, count: items.length };
+  lastScanMapping = mapping;
+  return mapping;
 }
 
 function findCandidates() {
@@ -356,6 +364,7 @@ function applyLabels(labels) {
 
 function clearOverlays() {
   console.log('[Content] Clearing', overlayState.overlays.length, 'overlays');
+  lastScanMapping = null;
   overlayState.overlays.forEach((overlay) => overlay.remove());
   overlayState.overlays = [];
   overlayState.idToElement.clear();
