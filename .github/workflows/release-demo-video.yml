@@ -60,7 +60,9 @@ jobs:
 
       - name: Read project version
         id: manifest-version
-        run: echo "version=$(node -p \"require('./extension/manifest.json').version\")" >> "$GITHUB_OUTPUT"
+        run: |
+          version=$(node -p "require('./extension/manifest.json').version")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Publish demo release
         uses: ncipollo/release-action@v1
