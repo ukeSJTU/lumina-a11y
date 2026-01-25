@@ -14,7 +14,8 @@ help:
 	@echo ""
 	@echo "Remotion Demo:"
 	@echo "  just demo-dev"
-	@echo "  just demo-build"
+	@echo "  just demo-render [composition] [output]"
+	@echo "  just demo-bundle"
 	@echo "  just demo-lint"
 	@echo ""
 	@echo "Examples:"
@@ -29,12 +30,14 @@ server example=DEFAULT_EXAMPLE port=DEFAULT_PORT:
 
 server-all port=DEFAULT_PORT:
 	@{{PYTHON}} -m http.server {{port}} --directory "{{EXAMPLES_DIR}}"
-
 # Remotion demo commands
 demo-dev:
 	@cd {{DEMO_DIR}} && pnpm run dev
 
-demo-build:
+demo-render composition="HelloWorld" output="out/video.mp4":
+	@cd {{DEMO_DIR}} && pnpm exec remotion render {{composition}} {{output}}
+
+demo-bundle:
 	@cd {{DEMO_DIR}} && pnpm run build
 
 demo-lint:
