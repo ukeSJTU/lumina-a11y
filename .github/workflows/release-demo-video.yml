@@ -1,0 +1,74 @@
+name: Release Demo Video
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "demo/**"
+
+permissions:
+  contents: write
+
+jobs:
+  render-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Resolve pnpm store path
+        id: pnpm-store
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('demo/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Cache Remotion browsers
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.remotion
+            ~/.cache/remotion
+          key: ${{ runner.os }}-remotion-${{ hashFiles('demo/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-remotion-
+
+      - name: Install demo dependencies
+        working-directory: demo
+        run: pnpm install --frozen-lockfile
+
+      - name: Render demo video
+        working-directory: demo
+        run: pnpm exec remotion render src/index.ts HelloWorld webilluminator-demo.mp4
+
+      - name: Read project version
+        id: manifest-version
+        run: echo "version=$(node -p \"require('./extension/manifest.json').version\")" >> "$GITHUB_OUTPUT"
+
+      - name: Publish demo release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: demo-video-v${{ steps.manifest-version.outputs.version }}
+          name: Demo Video v${{ steps.manifest-version.outputs.version }}
+          artifacts: demo/webilluminator-demo.mp4
+          allowUpdates: true
+          replacesArtifacts: true
+          artifactContentType: video/mp4
+          token: ${{ secrets.GITHUB_TOKEN }}
