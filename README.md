@@ -39,28 +39,7 @@ lumina-a11y/
 │   ├── content.js      # Handles DOM scanning and label injection
 │   └── popup/          # UI for settings (API Key management)
 │
-├── examples/           # "Bad" websites for demonstration purposes
-│   ├── icon-only-buttons/
-│   │   ├── index.html  # Icon-only controls with missing accessible names
-│   │   └── style.css
-│   ├── unlabeled-form/
-│   │   ├── index.html  # Form fields without associated labels
-│   │   └── style.css
-│   ├── custom-controls/
-│   │   ├── index.html  # Custom controls without semantic roles/keyboard support
-│   │   └── style.css
-│   ├── missing-alt-text/
-│   │   ├── index.html  # Images missing alt text, plus decorative/hidden examples
-│   │   └── style.css
-│   ├── web-components-shallow/
-│   │   ├── index.html  # Shallow open Shadow DOM with unlabeled buttons and images
-│   │   └── style.css
-│   ├── web-components-deep/
-│   │   ├── index.html  # Nested open Shadow DOM with unlabeled buttons and images
-│   │   └── style.css
-│   └── web-components-mixed/
-│       ├── index.html  # Mixed shallow/deep Shadow DOM examples
-│       └── style.css
+├── examples/           # Demo websites showcasing accessibility issues (see examples/README.md)
 │
 ├── justfile            # Command runner for development tasks
 └── README.md
@@ -103,10 +82,9 @@ cd lumina-a11y
 
 ## 🧪 How to Test (Demo)
 
-We have provided a few "broken" websites to demonstrate the power of WebIlluminator.
+We provide several example websites that demonstrate common accessibility issues. For detailed information about each example and testing instructions, see the [examples/README.md](./examples/README.md).
 
-1. **Launch an Example Page:**
-   You can run a simple local server to view one example:
+**Quick start:**
 
 ```bash
 # With just
@@ -114,27 +92,9 @@ just server icon-only-buttons
 
 # Or with python
 python3 -m http.server 5500 --directory examples/icon-only-buttons
-
 ```
 
-Replace `icon-only-buttons` with `unlabeled-form`, `custom-controls`, `missing-alt-text`, `web-components-shallow`, `web-components-deep`, or `web-components-mixed` to try the other demos. Open `http://localhost:5500` in your browser.
-
-2. **Verify the Issue:**
-
-- Open your browser's DevTools or turn on a screen reader (NVDA/VoiceOver).
-- `icon-only-buttons`: buttons have no accessible names.
-- `unlabeled-form`: inputs rely on placeholders with no associated labels.
-- `custom-controls`: interactive `<div>` elements have no roles or keyboard support.
-- `missing-alt-text`: images omit `alt`, include decorative `alt=""`, and include images hidden with `aria-hidden="true"` (only the missing-alt images should be labeled).
-- `web-components-shallow`: icon-only buttons and images missing `alt` inside a shallow open shadow root.
-- `web-components-deep`: icon-only buttons and images missing `alt` inside nested open shadow roots.
-- `web-components-mixed`: a combined page with both shallow and deep Shadow DOM examples.
-
-3. **Run the Repair:**
-
-- Click the WebIlluminator extension icon (or use the shortcut `Alt+R`).
-- Wait a few seconds for Gemini 3 to analyze the UI.
-- **Success!** The DOM is now patched. Inspect the elements again to see `aria-label="Search"`, `aria-label="Settings"`, or `alt="Trailhead at sunrise"`.
+Then open `http://localhost:5500`, click the WebIlluminator extension icon (or press `Alt+R`), and watch as missing labels are automatically added to the page.
 
 ---
 
