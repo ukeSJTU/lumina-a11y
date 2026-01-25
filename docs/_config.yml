@@ -1,6 +1,6 @@
 title: Lumina A11y Research Reports
 description: Digital accessibility research reports for 2024-2026.
-theme: jekyll-theme-cayman
+theme: jekyll-theme-minimal
 exclude:
   - resources.md
   - rules.md
