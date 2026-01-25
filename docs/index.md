@@ -1,3 +1,8 @@
+---
+layout: default
+title: Lumina A11y - Digital Accessibility Research
+---
+
 # Lumina A11y - Digital Accessibility Research
 
 ## Select Language / 选择语言
@@ -10,7 +15,7 @@ Choose your preferred language to view the in-depth research report on the Digit
 
 **In-Depth Research Report on the Digital Accessibility Gap 2024-2026**
 
-[Read in English →](en_us.md)
+[Read in English →](en_us.html)
 
 ---
 
@@ -18,7 +23,7 @@ Choose your preferred language to view the in-depth research report on the Digit
 
 **2024-2026 年数字无障碍鸿沟深度研究报告**
 
-[阅读中文版 →](zh_cn.md)
+[阅读中文版 →](zh_cn.html)
 
 ---
 

@@ -1,6 +1,11 @@
+---
+layout: default
+title: In-Depth Research Report on the Digital Accessibility Gap 2024-2026
+---
+
 # In-Depth Research Report on the Digital Accessibility Gap 2024-2026: Web Accessibility Defects, Characteristics of Blind and Low Vision User Groups, and the Evolution Path of AI-Assisted Technology
 
-**Language:** **English** | [中文](zh_cn.md)
+**Language:** **English** | [中文](zh_cn.html)
 
 ---
 
