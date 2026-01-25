@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Web Components: Mixed Shadow DOM</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main class="page">
+      <header class="header">
+        <p class="eyebrow">ARIA anti-pattern demo</p>
+        <h1>Web Components: Mixed Shadow DOM</h1>
+        <p class="subtitle">
+          This page combines shallow and deep Web Component trees. Both sections
+          contain icon-only controls and images missing <code>alt</code>.
+        </p>
+      </header>
+
+      <section class="card">
+        <h2>Shallow and deep components together</h2>
+        <div class="component-grid">
+          <div class="component-card">
+            <h3>Shallow component</h3>
+            <p class="subtitle">A single open shadow root with unlabeled controls.</p>
+            <div class="component-shell">
+              <quick-actions></quick-actions>
+            </div>
+          </div>
+          <div class="component-card">
+            <h3>Deep component</h3>
+            <p class="subtitle">Nested open shadow roots with unlabeled controls.</p>
+            <div class="component-shell">
+              <app-shell></app-shell>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      class QuickActions extends HTMLElement {
+        constructor() {
+          super();
+          this.attachShadow({ mode: 'open' });
+        }
+
+        connectedCallback() {
+          if (this.shadowRoot.children.length > 0) {
+            return;
+          }
+
+          this.shadowRoot.innerHTML = `
+            <style>
+              :host {
+                display: block;
+                font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+              }
+
+              .panel {
+                background: #ffffff;
+                border-radius: 12px;
+                border: 1px solid #e2e8f0;
+                padding: 16px;
+              }
+
+              .toolbar {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
+                margin: 12px 0 16px;
+              }
+
+              .icon-button {
+                width: 48px;
+                height: 48px;
+                border-radius: 12px;
+                border: 1px solid #d9e2ec;
+                background: #f8fafc;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+              }
+
+              .icon {
+                width: 22px;
+                height: 22px;
+                stroke: currentColor;
+                stroke-width: 2;
+                fill: none;
+                stroke-linecap: round;
+                stroke-linejoin: round;
+              }
+
+              .media {
+                display: flex;
+                gap: 12px;
+                align-items: center;
+              }
+
+              .media-image {
+                width: 140px;
+                height: 90px;
+                border-radius: 10px;
+                border: 1px solid #e2e8f0;
+                object-fit: cover;
+              }
+
+              .caption {
+                margin: 0;
+                color: #52606d;
+                font-size: 13px;
+              }
+            </style>
+            <div class="panel">
+              <h4>Workspace actions</h4>
+              <div class="toolbar">
+                <button class="icon-button" type="button">
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <circle cx="10" cy="10" r="6"></circle>
+                    <line x1="15" y1="15" x2="21" y2="21"></line>
+                  </svg>
+                </button>
+                <button class="icon-button" type="button">
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <line x1="4" y1="7" x2="20" y2="7"></line>
+                    <line x1="4" y1="12" x2="20" y2="12"></line>
+                    <line x1="4" y1="17" x2="20" y2="17"></line>
+                  </svg>
+                </button>
+                <button class="icon-button" type="button">
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M12 20s-6-4.3-8.4-7.4C1.6 9.1 3.4 6 6.3 6c1.8 0 3.3 1 4.7 2.6C12.3 7 13.9 6 15.7 6c2.9 0 4.7 3.1 2.7 6.6C18 15.7 12 20 12 20z"></path>
+                  </svg>
+                </button>
+              </div>
+              <div class="media">
+                <img class="media-image" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='90'><rect width='140' height='90' fill='%23c7d2fe'/><circle cx='40' cy='45' r='22' fill='%2393c5fd'/><rect x='72' y='20' width='52' height='50' rx='8' fill='%2360a5fa'/></svg>">
+                <p class="caption">Preview image inside Shadow DOM with no alt text.</p>
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      class AppShell extends HTMLElement {
+        constructor() {
+          super();
+          this.attachShadow({ mode: 'open' });
+        }
+
+        connectedCallback() {
+          if (this.shadowRoot.children.length > 0) {
+            return;
+          }
+
+          this.shadowRoot.innerHTML = `
+            <style>
+              :host {
+                display: block;
+                font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+              }
+
+              .shell {
+                border-radius: 16px;
+                border: 1px solid #cbd5e1;
+                padding: 16px;
+                background: #f1f5f9;
+              }
+
+              .shell-header h4 {
+                margin: 0 0 6px;
+              }
+
+              .shell-header p {
+                margin: 0 0 12px;
+                color: #52606d;
+              }
+            </style>
+            <div class="shell">
+              <div class="shell-header">
+                <h4>Operations console</h4>
+                <p>Nested Web Components render buttons and images.</p>
+              </div>
+              <tool-pane></tool-pane>
+            </div>
+          `;
+        }
+      }
+
+      class ToolPane extends HTMLElement {
+        constructor() {
+          super();
+          this.attachShadow({ mode: 'open' });
+        }
+
+        connectedCallback() {
+          if (this.shadowRoot.children.length > 0) {
+            return;
+          }
+
+          this.shadowRoot.innerHTML = `
+            <style>
+              :host {
+                display: block;
+                font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+              }
+
+              .pane {
+                border-radius: 14px;
+                border: 1px solid #d9e2ec;
+                padding: 14px;
+                background: #ffffff;
+                display: grid;
+                gap: 12px;
+              }
+
+              .pane h5 {
+                margin: 0 0 4px;
+              }
+
+              .pane p {
+                margin: 0;
+                color: #52606d;
+              }
+            </style>
+            <div class="pane">
+              <div>
+                <h5>Alert workflow</h5>
+                <p>Icons and imagery are rendered inside the deepest shadow root.</p>
+              </div>
+              <action-ribbon></action-ribbon>
+            </div>
+          `;
+        }
+      }
+
+      class ActionRibbon extends HTMLElement {
+        constructor() {
+          super();
+          this.attachShadow({ mode: 'open' });
+        }
+
+        connectedCallback() {
+          if (this.shadowRoot.children.length > 0) {
+            return;
+          }
+
+          this.shadowRoot.innerHTML = `
+            <style>
+              :host {
+                display: block;
+                font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+              }
+
+              .ribbon {
+                border-radius: 12px;
+                border: 1px solid #e2e8f0;
+                padding: 12px;
+                background: #f8fafc;
+              }
+
+              .toolbar {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 12px;
+              }
+
+              .icon-button {
+                width: 46px;
+                height: 46px;
+                border-radius: 12px;
+                border: 1px solid #d9e2ec;
+                background: #ffffff;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+              }
+
+              .icon {
+                width: 22px;
+                height: 22px;
+                stroke: currentColor;
+                stroke-width: 2;
+                fill: none;
+                stroke-linecap: round;
+                stroke-linejoin: round;
+              }
+
+              .ribbon-image {
+                width: 160px;
+                height: 90px;
+                border-radius: 10px;
+                border: 1px solid #e2e8f0;
+                object-fit: cover;
+              }
+            </style>
+            <div class="ribbon">
+              <div class="toolbar">
+                <button class="icon-button" type="button">
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <circle cx="10" cy="10" r="6"></circle>
+                    <line x1="15" y1="15" x2="21" y2="21"></line>
+                  </svg>
+                </button>
+                <button class="icon-button" type="button">
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <line x1="4" y1="7" x2="20" y2="7"></line>
+                    <line x1="4" y1="12" x2="20" y2="12"></line>
+                    <line x1="4" y1="17" x2="20" y2="17"></line>
+                  </svg>
+                </button>
+                <button class="icon-button" type="button">
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M12 20s-6-4.3-8.4-7.4C1.6 9.1 3.4 6 6.3 6c1.8 0 3.3 1 4.7 2.6C12.3 7 13.9 6 15.7 6c2.9 0 4.7 3.1 2.7 6.6C18 15.7 12 20 12 20z"></path>
+                  </svg>
+                </button>
+              </div>
+              <img class="ribbon-image" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='90'><rect width='160' height='90' fill='%23fee2e2'/><rect x='12' y='12' width='60' height='66' rx='8' fill='%23fecaca'/><circle cx='118' cy='40' r='24' fill='%23fca5a5'/><rect x='92' y='66' width='52' height='12' rx='6' fill='%23f87171'/></svg>">
+            </div>
+          `;
+        }
+      }
+
+      if (!customElements.get('quick-actions')) {
+        customElements.define('quick-actions', QuickActions);
+      }
+      if (!customElements.get('app-shell')) {
+        customElements.define('app-shell', AppShell);
+      }
+      if (!customElements.get('tool-pane')) {
+        customElements.define('tool-pane', ToolPane);
+      }
+      if (!customElements.get('action-ribbon')) {
+        customElements.define('action-ribbon', ActionRibbon);
+      }
+    </script>
+  </body>
+</html>

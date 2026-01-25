@@ -49,8 +49,17 @@ lumina-a11y/
 │   ├── custom-controls/
 │   │   ├── index.html  # Custom controls without semantic roles/keyboard support
 │   │   └── style.css
-│   └── missing-alt-text/
-│       ├── index.html  # Images missing alt text, plus decorative/hidden examples
+│   ├── missing-alt-text/
+│   │   ├── index.html  # Images missing alt text, plus decorative/hidden examples
+│   │   └── style.css
+│   ├── web-components-shallow/
+│   │   ├── index.html  # Shallow open Shadow DOM with unlabeled buttons and images
+│   │   └── style.css
+│   ├── web-components-deep/
+│   │   ├── index.html  # Nested open Shadow DOM with unlabeled buttons and images
+│   │   └── style.css
+│   └── web-components-mixed/
+│       ├── index.html  # Mixed shallow/deep Shadow DOM examples
 │       └── style.css
 │
 ├── justfile            # Command runner for development tasks
@@ -108,7 +117,7 @@ python3 -m http.server 5500 --directory examples/icon-only-buttons
 
 ```
 
-Replace `icon-only-buttons` with `unlabeled-form`, `custom-controls`, or `missing-alt-text` to try the other demos. Open `http://localhost:5500` in your browser.
+Replace `icon-only-buttons` with `unlabeled-form`, `custom-controls`, `missing-alt-text`, `web-components-shallow`, `web-components-deep`, or `web-components-mixed` to try the other demos. Open `http://localhost:5500` in your browser.
 
 2. **Verify the Issue:**
 
@@ -117,6 +126,9 @@ Replace `icon-only-buttons` with `unlabeled-form`, `custom-controls`, or `missin
 - `unlabeled-form`: inputs rely on placeholders with no associated labels.
 - `custom-controls`: interactive `<div>` elements have no roles or keyboard support.
 - `missing-alt-text`: images omit `alt`, include decorative `alt=""`, and include images hidden with `aria-hidden="true"` (only the missing-alt images should be labeled).
+- `web-components-shallow`: icon-only buttons and images missing `alt` inside a shallow open shadow root.
+- `web-components-deep`: icon-only buttons and images missing `alt` inside nested open shadow roots.
+- `web-components-mixed`: a combined page with both shallow and deep Shadow DOM examples.
 
 3. **Run the Repair:**
 
