@@ -2,6 +2,7 @@ EXAMPLES_DIR := "examples"
 DEFAULT_EXAMPLE := "icon-only-buttons"
 DEFAULT_PORT := "5500"
 PYTHON := "python3"
+DEMO_DIR := "demo"
 
 default: help
 
@@ -10,6 +11,11 @@ help:
 	@echo "  just list-examples"
 	@echo "  just server <example> [port]"
 	@echo "  just server-all [port]"
+	@echo ""
+	@echo "Remotion Demo:"
+	@echo "  just demo-dev"
+	@echo "  just demo-build"
+	@echo "  just demo-lint"
 	@echo ""
 	@echo "Examples:"
 	@echo "  just server {{DEFAULT_EXAMPLE}}"
@@ -23,3 +29,13 @@ server example=DEFAULT_EXAMPLE port=DEFAULT_PORT:
 
 server-all port=DEFAULT_PORT:
 	@{{PYTHON}} -m http.server {{port}} --directory "{{EXAMPLES_DIR}}"
+
+# Remotion demo commands
+demo-dev:
+	@cd {{DEMO_DIR}} && pnpm run dev
+
+demo-build:
+	@cd {{DEMO_DIR}} && pnpm run build
+
+demo-lint:
+	@cd {{DEMO_DIR}} && pnpm run lint
