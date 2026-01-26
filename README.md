@@ -105,6 +105,11 @@ python3 -m http.server 5500 --directory examples/icon-only-buttons
 
 Then open `http://localhost:5500`, click the WebIlluminator extension icon (or press `Alt+R`), and watch as missing labels are automatically added to the page.
 
+SPA example triggers:
+- `spa-route-navigation`: click the route pills to swap views.
+- `spa-async-content`: wait for the async load or press the refresh button.
+- `spa-infinite-scroll`: scroll inside the feed container to append new items.
+
 ---
 
 ## 🛠 Tech Stack

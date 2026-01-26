@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SPA Route Navigation (Missing Labels)</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main class="page">
+      <header class="header">
+        <p class="eyebrow">ARIA anti-pattern demo</p>
+        <h1>SPA Route Navigation</h1>
+        <p class="subtitle">
+          This single-page layout swaps views with the History API instead of full reloads.
+          Each route injects icon-only controls and images without alt text into the DOM.
+        </p>
+      </header>
+
+      <section class="shell">
+        <nav class="tabs" aria-label="SPA sections">
+          <button class="tab" type="button" data-route="overview">Overview</button>
+          <button class="tab" type="button" data-route="queue">Queue</button>
+          <button class="tab" type="button" data-route="insights">Insights</button>
+        </nav>
+        <div id="view" class="view" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <script>
+      const snapshotImage = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='100'><rect width='160' height='100' fill='%23e0f2fe'/><circle cx='48' cy='50' r='26' fill='%2393c5fd'/><rect x='90' y='24' width='54' height='52' rx='8' fill='%2360a5fa'/></svg>";
+      const detailImage = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='100'><rect width='160' height='100' fill='%23fee2e2'/><rect x='20' y='48' width='18' height='32' fill='%23f87171'/><rect x='50' y='32' width='18' height='48' fill='%23fb7185'/><rect x='80' y='20' width='18' height='60' fill='%23f43f5e'/><rect x='110' y='40' width='18' height='40' fill='%23e11d48'/></svg>";
+      const queueImage = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='100'><rect width='160' height='100' fill='%23dcfce7'/><circle cx='40' cy='38' r='18' fill='%2386efac'/><circle cx='100' cy='60' r='24' fill='%2322c55e'/><rect x='118' y='18' width='30' height='24' rx='6' fill='%2316a34a'/></svg>";
+      const insightsImage = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='100'><rect width='160' height='100' fill='%23ede9fe'/><polyline points='10,70 50,40 90,55 130,30 150,40' fill='none' stroke='%238b5cf6' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/><circle cx='50' cy='40' r='6' fill='%238b5cf6'/><circle cx='130' cy='30' r='6' fill='%238b5cf6'/></svg>";
+
+      const templates = {
+        overview: `
+          <section class="card">
+            <span class="badge">Overview</span>
+            <h2>Campaign pulse</h2>
+            <p class="small">This dashboard view appears when the route updates.</p>
+            <div class="toolbar">
+              <button class="icon-button" type="button">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <circle cx="10" cy="10" r="6"></circle>
+                  <line x1="15" y1="15" x2="21" y2="21"></line>
+                </svg>
+              </button>
+              <button class="icon-button" type="button">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <line x1="4" y1="7" x2="20" y2="7"></line>
+                  <line x1="4" y1="12" x2="20" y2="12"></line>
+                  <line x1="4" y1="17" x2="20" y2="17"></line>
+                </svg>
+              </button>
+              <button class="icon-button" type="button">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M5 12h14"></path>
+                  <path d="M12 5l7 7-7 7"></path>
+                </svg>
+              </button>
+            </div>
+            <div class="media">
+              <img src="${snapshotImage}">
+              <div>
+                <h3>Workspace snapshot</h3>
+                <p class="small">A quick glance at current activity levels.</p>
+              </div>
+            </div>
+          </section>
+          <section class="card">
+            <span class="badge">Highlights</span>
+            <h2>Top creatives</h2>
+            <div class="media">
+              <img src="${detailImage}">
+              <div>
+                <h3>Variant performance</h3>
+                <p class="small">Dynamic cards swap in with missing alt text.</p>
+              </div>
+            </div>
+            <div class="toolbar">
+              <button class="icon-button" type="button">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <circle cx="12" cy="12" r="7"></circle>
+                  <path d="M12 8v4"></path>
+                  <circle cx="12" cy="17" r="1"></circle>
+                </svg>
+              </button>
+              <button class="icon-button" type="button">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <rect x="5" y="5" width="14" height="14" rx="2"></rect>
+                  <path d="M9 9h6"></path>
+                  <path d="M9 13h6"></path>
+                </svg>
+              </button>
+            </div>
+          </section>
+        `,
+        queue: `
+          <section class="card">
+            <span class="badge">Queue</span>
+            <h2>Incoming tickets</h2>
+            <p class="small">SPA navigation swaps this list without reloads.</p>
+            <div class="media">
+              <img src="${queueImage}">
+              <div>
+                <h3>Priority requests</h3>
+                <p class="small">Tickets arrive with unlabeled controls.</p>
+              </div>
+            </div>
+            <div class="toolbar">
+              <button class="icon-button" type="button">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M12 3l8 6-8 12-8-12z"></path>
+                </svg>
+              </button>
+              <button class="icon-button" type="button">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <circle cx="12" cy="7" r="3"></circle>
+                  <path d="M5 21c1.5-4 5-6 7-6s5.5 2 7 6"></path>
+                </svg>
+              </button>
+              <button class="icon-button" type="button">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M6 4h12"></path>
+                  <path d="M6 10h12"></path>
+                  <path d="M6 16h12"></path>
+                </svg>
+              </button>
+            </div>
+          </section>
+          <section class="card">
+            <span class="badge">Escalations</span>
+            <h2>Action backlog</h2>
+            <div class="media">
+              <img src="${detailImage}">
+              <div>
+                <h3>Escalation timeline</h3>
+                <p class="small">Charts load when the view changes.</p>
+              </div>
+            </div>
+            <div class="toolbar">
+              <button class="icon-button" type="button">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M6 12h12"></path>
+                  <path d="M12 6v12"></path>
+                </svg>
+              </button>
+              <button class="icon-button" type="button">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M5 12h14"></path>
+                  <path d="M12 5l7 7-7 7"></path>
+                </svg>
+              </button>
+            </div>
+          </section>
+        `,
+        insights: `
+          <section class="card">
+            <span class="badge">Insights</span>
+            <h2>Audience trends</h2>
+            <p class="small">Insights panels are injected on route change.</p>
+            <div class="media">
+              <img src="${insightsImage}">
+              <div>
+                <h3>Trend snapshot</h3>
+                <p class="small">Dynamic chart tiles have no alt text.</p>
+              </div>
+            </div>
+            <div class="toolbar">
+              <button class="icon-button" type="button">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <circle cx="12" cy="12" r="7"></circle>
+                  <path d="M12 9v6"></path>
+                  <path d="M9 12h6"></path>
+                </svg>
+              </button>
+              <button class="icon-button" type="button">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M4 6h16"></path>
+                  <path d="M7 12h10"></path>
+                  <path d="M10 18h4"></path>
+                </svg>
+              </button>
+              <button class="icon-button" type="button">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M8 5h8"></path>
+                  <path d="M6 9h12"></path>
+                  <path d="M4 13h16"></path>
+                  <path d="M2 17h20"></path>
+                </svg>
+              </button>
+            </div>
+          </section>
+          <section class="card">
+            <span class="badge">Notes</span>
+            <h2>Weekly narrative</h2>
+            <div class="media">
+              <img src="${snapshotImage}">
+              <div>
+                <h3>Regional lift</h3>
+                <p class="small">Each new view includes unlabeled icons.</p>
+              </div>
+            </div>
+          </section>
+        `
+      };
+
+      const view = document.getElementById('view');
+      const tabs = Array.from(document.querySelectorAll('.tab'));
+
+      const setActiveTab = (route) => {
+        tabs.forEach((tab) => {
+          tab.classList.toggle('active', tab.dataset.route === route);
+        });
+      };
+
+      const render = (route) => {
+        const safeRoute = templates[route] ? route : 'overview';
+        view.innerHTML = templates[safeRoute];
+        setActiveTab(safeRoute);
+      };
+
+      const navigate = (route, pushState) => {
+        const safeRoute = templates[route] ? route : 'overview';
+        if (pushState) {
+          history.pushState({ route: safeRoute }, '', `#${safeRoute}`);
+        }
+        render(safeRoute);
+      };
+
+      const getRouteFromHash = () => {
+        const hash = window.location.hash.replace('#', '');
+        return templates[hash] ? hash : 'overview';
+      };
+
+      tabs.forEach((tab) => {
+        tab.addEventListener('click', () => {
+          navigate(tab.dataset.route, true);
+        });
+      });
+
+      window.addEventListener('popstate', (event) => {
+        const route = (event.state && event.state.route) || getRouteFromHash();
+        render(route);
+      });
+
+      const initialRoute = getRouteFromHash();
+      history.replaceState({ route: initialRoute }, '', `#${initialRoute}`);
+      render(initialRoute);
+    </script>
+  </body>
+</html>

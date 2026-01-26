@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SPA Infinite Scroll (Missing Labels)</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main class="page">
+      <header class="header">
+        <p class="eyebrow">ARIA anti-pattern demo</p>
+        <h1>SPA Infinite Scroll</h1>
+        <p class="subtitle">
+          Scroll inside the feed to append new items. Each batch injects icon-only controls
+          and images without alt text, similar to infinite-scroll SPAs.
+        </p>
+      </header>
+
+      <section class="shell">
+        <div class="scroll-shell" id="scroll-shell">
+          <ul class="feed" id="feed"></ul>
+          <div class="loading" id="loading" hidden>Loading more items...</div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const feed = document.getElementById('feed');
+      const scrollShell = document.getElementById('scroll-shell');
+      const loading = document.getElementById('loading');
+
+      const previews = [
+        "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='88' height='68'><rect width='88' height='68' fill='%23dbeafe'/><circle cx='30' cy='32' r='16' fill='%2393c5fd'/><rect x='52' y='16' width='26' height='36' rx='6' fill='%2360a5fa'/></svg>",
+        "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='88' height='68'><rect width='88' height='68' fill='%23fee2e2'/><rect x='10' y='12' width='22' height='44' rx='6' fill='%23fca5a5'/><rect x='38' y='20' width='40' height='32' rx='6' fill='%23f87171'/></svg>",
+        "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='88' height='68'><rect width='88' height='68' fill='%23dcfce7'/><circle cx='30' cy='34' r='16' fill='%2386efac'/><rect x='50' y='20' width='28' height='32' rx='6' fill='%2322c55e'/></svg>"
+      ];
+
+      let page = 0;
+      let isLoading = false;
+
+      const buildItem = (index) => {
+        const image = previews[index % previews.length];
+        const ticketNumber = 1200 + index;
+        return `
+          <li class="feed-item">
+            <img class="feed-image" src="${image}">
+            <div class="feed-body">
+              <h2>Order #${ticketNumber}</h2>
+              <p class="subtitle">New activity loaded on scroll.</p>
+              <div class="toolbar">
+                <button class="icon-button" type="button">
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M4 12h16"></path>
+                    <path d="M12 4v16"></path>
+                  </svg>
+                </button>
+                <button class="icon-button" type="button">
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M6 8h12"></path>
+                    <path d="M6 12h12"></path>
+                    <path d="M6 16h12"></path>
+                  </svg>
+                </button>
+                <button class="icon-button" type="button">
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <circle cx="12" cy="12" r="7"></circle>
+                    <path d="M12 9v6"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </li>
+        `;
+      };
+
+      const appendItems = (count) => {
+        if (isLoading) {
+          return;
+        }
+        isLoading = true;
+        loading.hidden = false;
+
+        setTimeout(() => {
+          const start = page * count;
+          const items = Array.from({ length: count }, (_, index) => buildItem(start + index)).join('');
+          feed.insertAdjacentHTML('beforeend', items);
+          page += 1;
+          isLoading = false;
+          loading.hidden = true;
+        }, 600);
+      };
+
+      const maybeLoadMore = () => {
+        const threshold = 120;
+        const position = scrollShell.scrollTop + scrollShell.clientHeight;
+        if (position >= scrollShell.scrollHeight - threshold) {
+          appendItems(4);
+        }
+      };
+
+      scrollShell.addEventListener('scroll', maybeLoadMore);
+      appendItems(6);
+    </script>
+  </body>
+</html>

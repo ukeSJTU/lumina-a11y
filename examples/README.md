@@ -42,6 +42,21 @@ This directory contains a collection of "broken" websites that demonstrate commo
 - **Elements:** A comprehensive test case combining multiple Shadow DOM patterns
 - **What to test:** Complex scenarios with mixed Shadow DOM depths
 
+### 8. SPA Route Navigation (`spa-route-navigation/`)
+- **Issue:** Single-page app route changes that swap views without full reloads
+- **Elements:** History API navigation injecting icon-only buttons and images missing `alt`
+- **What to test:** Click the route pills to swap views and reveal the dynamic content
+
+### 9. SPA Async Content (`spa-async-content/`)
+- **Issue:** Async content loads after the initial page render
+- **Elements:** Cards injected after a delay with icon-only buttons and missing `alt`
+- **What to test:** Wait for the simulated fetch or press refresh to load the cards
+
+### 10. SPA Infinite Scroll (`spa-infinite-scroll/`)
+- **Issue:** Content appended to a feed on scroll
+- **Elements:** Infinite-scroll items with icon-only controls and missing `alt`
+- **What to test:** Scroll inside the feed container to load more items
+
 ## 🧪 How to Test
 
 ### Method 1: Using the Justfile (Recommended)
@@ -70,6 +85,7 @@ Then open `http://localhost:5500` in your browser.
 ## 🔍 Testing Workflow
 
 1. **Open an example page** using one of the methods above
+   - For the SPA examples, trigger their behavior (route changes, async load, or scrolling) to reveal the injected content.
 2. **Verify the accessibility issues:**
    - Open Chrome DevTools (F12)
    - Try using a screen reader (NVDA on Windows, VoiceOver on Mac)

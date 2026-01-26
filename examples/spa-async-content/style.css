@@ -1,0 +1,141 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+  color: #0f172a;
+  background: #f1f5f9;
+}
+
+.page {
+  max-width: 980px;
+  margin: 48px auto;
+  padding: 0 20px;
+}
+
+.header {
+  margin-bottom: 24px;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 12px;
+  margin: 0 0 8px;
+  color: #6b7280;
+}
+
+.subtitle {
+  max-width: 720px;
+  color: #475569;
+  margin: 8px 0 0;
+}
+
+.shell {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 16px 35px rgba(15, 23, 42, 0.08);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.reload {
+  border: 1px solid #2563eb;
+  background: #2563eb;
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.status {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.placeholder {
+  display: grid;
+  gap: 10px;
+}
+
+.skeleton {
+  height: 12px;
+  background: #e2e8f0;
+  border-radius: 999px;
+}
+
+.grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.media {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.media img {
+  width: 96px;
+  height: 70px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  object-fit: cover;
+  background: #e2e8f0;
+}
+
+.toolbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.icon-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid #d9e2ec;
+  background: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.small {
+  color: #64748b;
+  font-size: 13px;
+  margin: 0;
+}
