@@ -39,7 +39,7 @@ server-all port=DEFAULT_PORT:
 demo-dev:
 	@cd {{DEMO_DIR}} && pnpm run dev
 
-demo-render composition="HelloWorld" output="out/video.mp4":
+demo-render composition="DemoMaster" output="out/video.mp4":
 	@cd {{DEMO_DIR}} && pnpm exec remotion render {{composition}} {{output}}
 
 demo-bundle:

@@ -56,7 +56,7 @@ jobs:
 
       - name: Render demo video
         working-directory: demo
-        run: pnpm exec remotion render src/index.ts HelloWorld webilluminator-demo.mp4
+        run: pnpm exec remotion render src/index.ts DemoMaster webilluminator-demo.mp4
 
       - name: Read project version
         id: manifest-version
