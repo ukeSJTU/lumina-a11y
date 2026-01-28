@@ -94,6 +94,10 @@ const GhostIconCloud: React.FC<{ opacity: number }> = ({ opacity }) => {
     { x: 0.52, y: 0.28, size: 80 },
     { x: 0.68, y: 0.52, size: 74 },
     { x: 0.82, y: 0.34, size: 64 },
+    { x: 0.18, y: 0.7, size: 68 },
+    { x: 0.38, y: 0.74, size: 80 },
+    { x: 0.58, y: 0.7, size: 72 },
+    { x: 0.78, y: 0.74, size: 64 },
   ];
 
   return (
