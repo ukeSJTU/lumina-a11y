@@ -2,6 +2,7 @@ import React from "react";
 import { ShotScaffold } from "./ShotScaffold";
 import type { ShotSpec } from "./shotData";
 import { S01HookShot } from "./shots/S01Hook";
+import { S02ProblemShot } from "./shots/S02Problem";
 
 type ShotProps = {
   spec: ShotSpec;
@@ -20,6 +21,10 @@ export const Shot: React.FC<ShotProps> = ({ spec }) => {
         captionText={captionText}
       />
     );
+  }
+
+  if (spec.id === "S02") {
+    return <S02ProblemShot onScreenText={spec.onScreenText} />;
   }
 
   return (
