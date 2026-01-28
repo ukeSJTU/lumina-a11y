@@ -22,16 +22,16 @@ const buildWavePath = (
   fps: number,
 ) => {
   const phase = (frame / fps) * Math.PI * 2 * 0.4;
-  const amplitude = 18 + Math.sin((frame / fps) * Math.PI * 2 * 0.12) * 6;
+  const amplitude = 30 + Math.sin((frame / fps) * Math.PI * 2 * 0.14) * 14;
   const centerY = height / 2;
-  const frequency = Math.PI * 4;
+  const frequency = Math.PI * 5;
 
   const points: string[] = [];
   for (let i = 0; i <= WAVE_POINTS; i += 1) {
     const progress = i / WAVE_POINTS;
     const x = progress * width;
     const y =
-      centerY + Math.sin(progress * frequency + phase) * amplitude * 0.9;
+      centerY + Math.sin(progress * frequency + phase) * amplitude;
     points.push(`${x.toFixed(2)},${y.toFixed(2)}`);
   }
 
