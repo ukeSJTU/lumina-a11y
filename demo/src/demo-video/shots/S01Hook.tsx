@@ -9,8 +9,8 @@ import {
 const BACKGROUND_COLOR = "#0C0F14";
 const TEXT_COLOR = "#F4F6F8";
 const ACCENT_COLOR = "#48E2C2";
-const GHOST_BORDER = "rgba(244, 246, 248, 0.25)";
-const GHOST_FILL = "rgba(244, 246, 248, 0.08)";
+const GHOST_BORDER = "rgba(244, 246, 248, 0.5)";
+const GHOST_FILL = "rgba(244, 246, 248, 0.16)";
 
 const WAVE_HEIGHT = 140;
 const WAVE_POINTS = 80;
@@ -116,11 +116,11 @@ const GhostIconCloud: React.FC<{ opacity: number }> = ({ opacity }) => {
               borderRadius: 18,
               border: `1px solid ${GHOST_BORDER}`,
               backgroundColor: GHOST_FILL,
-              boxShadow: `0 0 30px rgba(72, 226, 194, 0.08)`,
+              boxShadow: `0 0 40px rgba(72, 226, 194, 0.18)`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              opacity: opacity * (0.22 + index * 0.03),
+              opacity: opacity * (0.4 + index * 0.05),
               transform: `translate(-50%, -50%) translateY(${float}px) scale(${scale})`,
             }}
           >
