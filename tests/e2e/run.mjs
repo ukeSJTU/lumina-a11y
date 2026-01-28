@@ -2,6 +2,7 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import { fileURLToPath } from "url";
+import chalk from "chalk";
 import { chromium } from "playwright";
 import { createGeminiMock } from "./mock/gemini-mock.mjs";
 import { collectIssues, waitForIssuesCleared } from "./helpers/a11y.mjs";
@@ -77,26 +78,59 @@ function writeJson(filePath, payload) {
   fs.writeFileSync(filePath, JSON.stringify(payload, null, 2));
 }
 
-function createLogger(logFile) {
-  return {
-    info: (...args) => {
-      console.log(...args);
-      if (logFile) {
-        fs.appendFileSync(logFile, `[info] ${args.map(String).join(" ")}\n`);
-      }
-    },
-    warn: (...args) => {
-      console.warn(...args);
-      if (logFile) {
-        fs.appendFileSync(logFile, `[warn] ${args.map(String).join(" ")}\n`);
-      }
-    },
-    error: (...args) => {
-      console.error(...args);
-      if (logFile) {
-        fs.appendFileSync(logFile, `[error] ${args.map(String).join(" ")}\n`);
-      }
+const LOG_LEVELS = {
+  info: { label: "INFO", color: (value) => chalk.cyan(value) },
+  warn: { label: "WARN", color: (value) => chalk.yellow(value) },
+  error: { label: "ERROR", color: (value) => chalk.red(value) }
+};
+
+function normalizeSeverity(severity) {
+  if (!severity) {
+    return "info";
+  }
+  const normalized = String(severity).toLowerCase();
+  if (normalized === "warning") {
+    return "warn";
+  }
+  if (normalized === "info" || normalized === "warn" || normalized === "error") {
+    return normalized;
+  }
+  return "info";
+}
+
+function formatLogLine({ level, scope, message, colorize }) {
+  const entry = LOG_LEVELS[level] || LOG_LEVELS.info;
+  const scopeLabel = `[${String(scope || "e2e").toUpperCase()}]`;
+  const scopeText = colorize ? chalk.magenta(scopeLabel) : scopeLabel;
+  const levelText = colorize ? entry.color(entry.label) : entry.label;
+  return `${scopeText} ${levelText} ${message}`;
+}
+
+function createLogger(logFile, defaultScope = "e2e") {
+  const useColor = Boolean(process.stdout.isTTY || process.stderr.isTTY);
+  const write = (level, scope, args) => {
+    const message = args.map(String).join(" ");
+    const consoleLine = formatLogLine({ level, scope, message, colorize: useColor });
+    if (level === "warn") {
+      console.warn(consoleLine);
+    } else if (level === "error") {
+      console.error(consoleLine);
+    } else {
+      console.log(consoleLine);
     }
+    if (logFile) {
+      const fileLine = formatLogLine({ level, scope, message, colorize: false });
+      fs.appendFileSync(logFile, `${fileLine}\n`);
+    }
+  };
+  const scoped = (scope) => ({
+    info: (...args) => write("info", scope, args),
+    warn: (...args) => write("warn", scope, args),
+    error: (...args) => write("error", scope, args)
+  });
+  return {
+    ...scoped(defaultScope),
+    scope: (scope) => scoped(scope)
   };
 }
 
@@ -123,6 +157,7 @@ async function setApiKey(worker, apiKey) {
 }
 
 async function launchContext(userDataDir, log, verbose) {
+  const pwLog = log.scope("pw");
   const baseOptions = {
     headless: options.headless,
     viewport: { width: 1280, height: 800 },
@@ -140,7 +175,9 @@ async function launchContext(userDataDir, log, verbose) {
       ? {
           isEnabled: () => true,
           log: (name, severity, message) => {
-            log.info(`[pw:${severity}] ${name} ${message}`);
+            const level = normalizeSeverity(severity);
+            const target = pwLog[level] || pwLog.info;
+            target(`${name} ${message}`);
           }
         }
       : undefined
@@ -166,12 +203,12 @@ async function launchContext(userDataDir, log, verbose) {
         : attempt.channel
           ? `channel=${attempt.channel}`
           : "bundled chromium";
-      log.info(`[e2e] Launching browser (${details})`);
+      log.info(`Launching browser (${details})`);
       return await chromium.launchPersistentContext(userDataDir, attempt);
     } catch (error) {
       lastError = error;
       const message = error?.stack || error?.message || String(error);
-      log.error("[e2e] Browser launch failed:", message);
+      log.error("Browser launch failed:", message);
     }
   }
   throw lastError;
@@ -185,7 +222,7 @@ async function waitForCaptureSlot({ runnerState, captureIntervalMs, log }) {
   const last = runnerState.lastFixAt || 0;
   const waitMs = captureIntervalMs - (now - last);
   if (waitMs > 0) {
-    log.info(`[e2e] Waiting ${waitMs}ms to avoid capture quota`);
+    log.info(`Waiting ${waitMs}ms to avoid capture quota`);
     await delay(waitMs);
   }
 }
@@ -219,7 +256,7 @@ async function runFixWithRetry({
         throw error;
       }
       const backoff = captureIntervalMs * attempt;
-      log.warn(`[e2e] Capture quota hit; retrying in ${backoff}ms`);
+      log.warn(`Capture quota hit; retrying in ${backoff}ms`);
       await delay(backoff);
     }
   }
@@ -274,7 +311,7 @@ async function runScenario({
       });
       after = await waitForIssuesCleared(page);
     } else {
-      log.info(`[e2e] Skipping fix for ${scenario.name} (no issues found)`);
+      log.info(`Skipping fix for ${scenario.name} (no issues found)`);
     }
     result.issues.after = after.count;
     writeJson(path.join(scenarioDir, "issues-after.json"), after);
@@ -321,13 +358,13 @@ async function run() {
   ensureDir(runDir);
   const logFile = path.join(runDir, "run.log");
   const log = createLogger(logFile);
-  log.info(`[e2e] Run start ${runId}`);
-  log.info(`[e2e] Config: ${options.configPath}`);
-  log.info(`[e2e] Headless: ${options.headless}`);
-  log.info(`[e2e] Port: ${options.port}`);
-  log.info(`[e2e] Capture interval: ${options.captureIntervalMs}ms`);
+  log.info(`Run start ${runId}`);
+  log.info(`Config: ${options.configPath}`);
+  log.info(`Headless: ${options.headless}`);
+  log.info(`Port: ${options.port}`);
+  log.info(`Capture interval: ${options.captureIntervalMs}ms`);
   if (options.onlyExamples) {
-    log.info(`[e2e] Filtered examples: ${Array.from(options.onlyExamples).join(", ")}`);
+    log.info(`Filtered examples: ${Array.from(options.onlyExamples).join(", ")}`);
   }
 
   let context = null;
@@ -346,7 +383,7 @@ async function run() {
       });
       server = serverInfo.server;
       baseUrl = serverInfo.baseUrl;
-      log.info(`[e2e] Static server listening at ${baseUrl}`);
+      log.info(`Static server listening at ${baseUrl}`);
     } catch (error) {
       const code = error?.code;
       if (code !== "EPERM" && code !== "EACCES") {
@@ -357,23 +394,23 @@ async function run() {
         rootDir: path.join(repoRoot, "examples"),
         baseUrl
       });
-      log.warn("[e2e] Port blocked; using routed host http://webilluminator.test");
+      log.warn("Port blocked; using routed host http://webilluminator.test");
     }
 
     const geminiMock = createGeminiMock();
     await geminiMock.attach(context);
-    log.info("[e2e] Gemini mock attached");
+    log.info("Gemini mock attached");
 
     const worker = await getServiceWorker(context);
     await setApiKey(worker, "test-key");
-    log.info("[e2e] API key set");
+    log.info("API key set");
 
     const page = await context.newPage();
 
     const runnerState = { lastFixAt: 0 };
 
     for (const scenario of scenarios) {
-      log.info(`[e2e] Running scenario ${scenario.name}`);
+      log.info(`Running scenario ${scenario.name}`);
       const outcome = await runScenario({
         scenario,
         page,
@@ -387,7 +424,7 @@ async function run() {
       });
       results.push(outcome);
       if (outcome.status !== "passed") {
-        log.error(`[e2e] Scenario failed: ${scenario.name}`, outcome.error || "");
+        log.error(`Scenario failed: ${scenario.name}`, outcome.error || "");
       }
     }
   } finally {
@@ -408,7 +445,7 @@ async function run() {
   };
 
   writeJson(path.join(runDir, "report.json"), report);
-  log.info(`[e2e] Report written to ${path.join(runDir, "report.json")}`);
+  log.info(`Report written to ${path.join(runDir, "report.json")}`);
 
   const failed = results.filter((result) => result.status !== "passed");
   if (failed.length) {
@@ -418,6 +455,7 @@ async function run() {
 
 run().catch((error) => {
   const message = error?.stack || error?.message || String(error);
-  console.error("[e2e] Failed:", message);
+  const log = createLogger();
+  log.error("Failed:", message);
   process.exitCode = 1;
 });
