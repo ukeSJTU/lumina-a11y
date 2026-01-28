@@ -1,0 +1,104 @@
+{
+  "baseUrl": "http://localhost:5500",
+  "examples": [
+    {
+      "name": "icon-only-buttons",
+      "path": "/icon-only-buttons/",
+      "actions": [
+        { "type": "waitForSelector", "selector": ".icon-button" }
+      ],
+      "assertions": [
+        { "type": "expectAttribute", "selector": ".icon-button", "attribute": "aria-label" }
+      ]
+    },
+    {
+      "name": "unlabeled-form",
+      "path": "/unlabeled-form/",
+      "actions": [
+        { "type": "waitForSelector", "selector": ".form" }
+      ],
+      "assertions": [
+        { "type": "expectAttribute", "selector": ".form input", "attribute": "aria-label" },
+        { "type": "expectAttribute", "selector": ".form textarea", "attribute": "aria-label" }
+      ]
+    },
+    {
+      "name": "custom-controls",
+      "path": "/custom-controls/",
+      "actions": [
+        { "type": "waitForSelector", "selector": ".toggle" }
+      ]
+    },
+    {
+      "name": "missing-alt-text",
+      "path": "/missing-alt-text/",
+      "actions": [
+        { "type": "waitForSelector", "selector": ".gallery img" }
+      ],
+      "assertions": [
+        { "type": "expectAttribute", "selector": "img[src=\"mountain.svg\"]", "attribute": "alt" },
+        { "type": "expectAttribute", "selector": "img[src=\"market.svg\"]", "attribute": "alt" },
+        { "type": "expectAttributeValue", "selector": "img[alt=\"\"]", "attribute": "alt", "value": "" },
+        { "type": "expectAttributeMissing", "selector": "img[aria-hidden=\"true\"]", "attribute": "alt" }
+      ]
+    },
+    {
+      "name": "web-components-shallow",
+      "path": "/web-components-shallow/",
+      "actions": [
+        { "type": "waitForSelector", "selector": "quick-actions" }
+      ]
+    },
+    {
+      "name": "web-components-deep",
+      "path": "/web-components-deep/",
+      "actions": [
+        { "type": "waitForSelector", "selector": "app-shell" }
+      ]
+    },
+    {
+      "name": "web-components-mixed",
+      "path": "/web-components-mixed/",
+      "actions": [
+        { "type": "waitForSelector", "selector": "quick-actions" }
+      ]
+    },
+    {
+      "name": "spa-route-navigation",
+      "path": "/spa-route-navigation/",
+      "actions": [
+        { "type": "waitForSelector", "selector": ".tab[data-route=\"queue\"]" },
+        { "type": "click", "selector": ".tab[data-route=\"queue\"]" },
+        { "type": "waitForSelector", "selector": ".view .icon-button" }
+      ],
+      "assertions": [
+        { "type": "expectAttribute", "selector": ".view .icon-button", "attribute": "aria-label" },
+        { "type": "expectAttribute", "selector": ".view img", "attribute": "alt" }
+      ]
+    },
+    {
+      "name": "spa-async-content",
+      "path": "/spa-async-content/",
+      "actions": [
+        { "type": "waitForSelector", "selector": ".grid" }
+      ],
+      "assertions": [
+        { "type": "expectAttribute", "selector": ".grid .icon-button", "attribute": "aria-label" },
+        { "type": "expectAttribute", "selector": ".grid img", "attribute": "alt" }
+      ]
+    },
+    {
+      "name": "spa-infinite-scroll",
+      "path": "/spa-infinite-scroll/",
+      "actions": [
+        { "type": "waitForSelector", "selector": ".feed-item" },
+        { "type": "scroll", "selector": "#scroll-shell", "distance": 800, "repeat": 2, "delayMs": 700 },
+        { "type": "waitForSelector", "selector": ".feed-item:nth-child(8)" }
+      ],
+      "assertions": [
+        { "type": "expectAttribute", "selector": ".feed-item .icon-button", "attribute": "aria-label" },
+        { "type": "expectAttribute", "selector": ".feed-item img", "attribute": "alt" }
+      ]
+    }
+  ]
+}

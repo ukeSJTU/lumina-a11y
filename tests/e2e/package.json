@@ -1,0 +1,14 @@
+{
+  "name": "webilluminator-e2e",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "e2e": "node run.mjs",
+    "e2e:headed": "HEADLESS=0 node run.mjs",
+    "e2e:headless": "HEADLESS=1 node run.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.2",
+    "playwright": "^1.48.2"
+  }
+}

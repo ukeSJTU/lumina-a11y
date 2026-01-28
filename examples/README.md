@@ -82,6 +82,19 @@ python3 -m http.server 5500
 
 Then open `http://localhost:5500` in your browser.
 
+## 🤖 Automated Regression
+
+For repeatable, automated regression checks across all example pages, use the Playwright runner:
+
+```bash
+cd tests/e2e
+npm install
+npx playwright install
+node run.mjs
+```
+
+Scenario definitions live in `tests/e2e/scenarios.json`. Full details are in `tests/README.md`.
+
 ## 🔍 Testing Workflow
 
 1. **Open an example page** using one of the methods above

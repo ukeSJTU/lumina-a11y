@@ -110,6 +110,19 @@ SPA example triggers:
 - `spa-async-content`: wait for the async load or press the refresh button.
 - `spa-infinite-scroll`: scroll inside the feed container to append new items.
 
+## ✅ Automated E2E Regression (Playwright)
+
+For repeatable regression testing across all examples (with a mocked Gemini response), use the Playwright runner:
+
+```bash
+cd tests/e2e
+npm install
+npx playwright install
+node run.mjs
+```
+
+Details, options, and output formats live in `tests/README.md`.
+
 ---
 
 ## 🛠 Tech Stack

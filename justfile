@@ -3,6 +3,7 @@ DEFAULT_EXAMPLE := "icon-only-buttons"
 DEFAULT_PORT := "5500"
 PYTHON := "python3"
 DEMO_DIR := "demo"
+E2E_DIR := "tests/e2e"
 
 default: help
 
@@ -17,6 +18,10 @@ help:
 	@echo "  just demo-render [composition] [output]"
 	@echo "  just demo-bundle"
 	@echo "  just demo-lint"
+	@echo ""
+	@echo "E2E Regression:"
+	@echo "  just e2e"
+	@echo "  just e2e-verbose"
 	@echo ""
 	@echo "Examples:"
 	@echo "  just server {{DEFAULT_EXAMPLE}}"
@@ -42,3 +47,9 @@ demo-bundle:
 
 demo-lint:
 	@cd {{DEMO_DIR}} && pnpm run lint
+
+e2e:
+	@cd {{E2E_DIR}} && node run.mjs
+
+e2e-verbose:
+	@cd {{E2E_DIR}} && node run.mjs --verbose
