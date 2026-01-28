@@ -22,7 +22,7 @@ The system SHALL provide a GitHub Actions workflow that renders the Remotion `De
 
 #### Scenario: Render and upload demo video
 - **WHEN** the workflow runs
-- **THEN** a release asset named `webilluminator-demo.mp4` is uploaded for the target release tag, rendered from `DemoMaster`
+- **THEN** a release asset named `webilluminator-demo.mp4` is uploaded for the target release tag, rendered from the `DemoMaster` composition
 
 ### Requirement: Demo video version tagging
 The workflow SHALL create or update a release tagged `demo-video-v<version>` with title `Demo Video v<version>`, where `<version>` is read from `extension/manifest.json` at render time.
@@ -44,3 +44,4 @@ The workflow SHALL support `workflow_dispatch` and `push` triggers on `main` for
 #### Scenario: Re-run rendering workflow
 - **WHEN** the workflow runs after a previous successful run
 - **THEN** the dependency and browser caches are restored
+

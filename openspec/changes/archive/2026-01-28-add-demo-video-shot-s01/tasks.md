@@ -6,4 +6,4 @@
 - [x] 1.5 Update the `release-demo-video` spec to reflect the demo master composition render target.
 
 ## 2. Validation
-- [ ] 2.1 Run `pnpm exec remotion render src/index.ts DemoShot-S01 out/s01.mp4` (or render `DemoMaster` if a full preview is needed).
+- [x] 2.1 Run `pnpm exec remotion render src/index.ts DemoShot-S01 out/s01.mp4` (or render `DemoMaster` if a full preview is needed).
