@@ -1,0 +1,12 @@
+## 1. Implementation
+- [x] 1.1 Add shared components for S04-S11 (logo lockup, extension badge, step rail, tech chip stack, scanning beam, SoM tags, Gemini callout, label pills, highlight rings, keystroke overlay, caption stack, flow diagram, benefit cards) in `demo/src/demo-video/components/`.
+- [x] 1.2 Implement the S04 reveal shot with typographic logo, extension badge pop, and "One click." pill.
+- [x] 1.3 Implement the S05 how-it-works shot with step rail, scan beam, SoM tags, Gemini callout, label pills, and tech chips.
+- [x] 1.4 Implement the S06 demo-before shot as a split screen with unlabeled icon buttons and highlight rings.
+- [x] 1.5 Implement the S07 demo-action shot with keystroke overlay, scan beam, SoM tags, Gemini callout, and label pill pops.
+- [x] 1.6 Implement the S08 demo-after shot with labeled state and caption stack for "Search", "Cart", and "Close".
+- [x] 1.7 Implement the S09 privacy shot flow diagram with BYOK/no-backend/no-data chips.
+- [x] 1.8 Implement the S10 benefits shot with three icon cards and soft glow.
+- [x] 1.9 Implement the S11 close lockup with repo URL and "Google Hackathon" badge placeholder.
+- [x] 1.10 Wire S04-S11 shots into `demo/src/demo-video/Shot.tsx`.
+- [x] 1.11 Validate visuals by rendering preview shots (e.g., `pnpm exec remotion render src/index.ts DemoShot-S04 out/s04.mp4`) or the full `DemoMaster` composition.
