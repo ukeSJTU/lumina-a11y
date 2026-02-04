@@ -11,7 +11,7 @@ The extension SHALL allow a user to enter a Gemini API key in the popup and pers
 - **THEN** the previously stored key is shown without re-entry
 
 ### Requirement: Scan trigger
-The extension SHALL provide separate Scan and Fix actions in the popup. Scan SHALL overlay visual IDs for unlabeled elements without applying labels. Fix SHALL run a semantic repair pass on the active tab and SHALL use the most recent scan mapping when available. If no prior scan mapping exists, Fix SHALL initiate a scan before repairing labels and log a console message indicating it is auto-scanning before repair. The popup SHALL display Save on its own row, and Scan and Fix as equal-width buttons on a second row.
+The extension SHALL provide separate Scan and Fix actions in the popup. Scan SHALL overlay visual IDs for unlabeled elements without applying labels. Fix SHALL run a semantic repair pass on the active tab and SHALL use the most recent scan mapping when available. If no prior scan mapping exists, Fix SHALL initiate a scan before repairing labels and log a console message indicating it is auto-scanning before repair. The popup SHALL present action buttons with a clear hierarchy, with Fix as the primary action and Scan as a secondary action. The popup SHALL include a slim accent header band above the main content. The popup SHALL place Save adjacent to the API key input and group the API key entry, actions, and status into distinct sections with consistent spacing.
 
 #### Scenario: User runs Scan preview
 - **WHEN** the user clicks Scan in the popup
@@ -29,8 +29,11 @@ The extension SHALL provide separate Scan and Fix actions in the popup. Scan SHA
 
 #### Scenario: Popup action layout
 - **WHEN** the popup is opened
-- **THEN** Save appears on its own row
-- **AND** Scan and Fix appear on a second row with equal widths
+- **THEN** the API key entry appears in its own section with Save adjacent to the input
+- **AND** a slim accent header band is visible above the content
+- **AND** Fix is visually emphasized as the primary action
+- **AND** Scan is presented as a secondary action nearby
+- **AND** the status message area is visible without shifting layout
 
 ### Requirement: Overlay visual IDs
 The content script SHALL identify interactive elements missing accessible names and `<img>` elements missing an `alt` attribute, excluding images that are decorative (`alt=""` or `role="presentation"`) or hidden from accessibility (`aria-hidden="true"`), and overlay temporary visual IDs that map to those elements for snapshot analysis.
